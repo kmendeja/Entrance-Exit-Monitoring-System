@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PLP Facial Monitor | Create Account</title>
+<link rel="icon" href="../images/logosmallplp.png">
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<style>
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+      font-family:'Poppins',sans-serif;
+    }
+
+    body{
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:
+        linear-gradient(
+          rgba(10,123,61,.75),
+          rgba(37,99,45,.75),
+          rgba(255,222,89,.75)
+        ),
+        url("../images/admin-loginpage.png") center/cover no-repeat;
+    }
+
+    /* ===== CARD ===== */
+    .card{
+      width:390px;
+      background:#fff;
+      padding:72px 32px 34px;
+      border-radius:10px;
+      text-align:center;
+      box-shadow:0 10px 35px rgba(0,0,0,.25);
+      position:relative;
+    }
+
+    /* ===== LOGO ===== */
+    .logo{
+      position:absolute;
+      top:-55px;
+      left:50%;
+      transform:translateX(-50%);
+      width:110px;
+      height:110px;
+      background:#fff;
+      border-radius:50%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      box-shadow:0 6px 20px rgba(0,0,0,.25);
+    }
+    .logo img{
+      width:85%;
+    }
+
+    /* ===== TEXT ===== */
+    h2{
+      font-size:1.55rem;
+      font-weight:700;
+    }
+    .subtitle{
+      font-size:.9rem;
+      color:#666;
+      margin:6px 0 22px;
+    }
+
+    /* ===== INPUTS ===== */
+    .input-group{
+      margin-bottom:14px;
+    }
+    .input-group input{
+      width:100%;
+      padding:12px 42px 12px 14px;
+      border:1px solid #ccc;
+      border-radius:6px;
+      font-size:.9rem;
+    }
+    .input-group input:focus{
+      outline:none;
+      border-color:#0a7c3c;
+    }
+
+    /* ===== PASSWORD ICON ===== */
+    .input-wrapper{
+      position:relative;
+    }
+    .toggle-password{
+      position:absolute;
+      right:12px;
+      top:50%;
+      transform:translateY(-50%);
+      cursor:pointer;
+      color:#555;
+    }
+    .toggle-password:hover{
+      color:#0a7c3c;
+    }
+
+    /* ===== BUTTON ===== */
+    .btn{
+      width:100%;
+      padding:12px;
+      border:none;
+      background:#0a7c3c;
+      color:#fff;
+      font-weight:600;
+      border-radius:4px;
+      cursor:pointer;
+      margin-top:8px;
+    }
+    .btn:hover{
+      background:#096a33;
+    }
+
+    /* ===== FOOTER ===== */
+    .footer{
+      margin-top:14px;
+      font-size:.85rem;
+    }
+    .footer a{
+      font-weight:600;
+      color:#000;
+      text-decoration:none;
+    }
+    .footer a:hover{
+      text-decoration:underline;
+    }
+
+    /* ===== REMOVE DEFAULT PASSWORD ICON ===== */
+    input::-ms-reveal,
+    input::-ms-clear{
+      display:none;
+    }
+    input[type="password"]::-webkit-credentials-auto-fill-button,
+    input[type="password"]::-webkit-contacts-auto-fill-button,
+    input[type="password"]::-webkit-clear-button,
+    input[type="password"]::-webkit-inner-spin-button{
+      display:none !important;
+      visibility:hidden;
+    }
+
+    /* ===== MOBILE ===== */
+    @media(max-width:420px){
+      .card{width:90%;}
+    }
+</style>
+</head>
+
+<body>
+
+<div class="card">
+    <div class="logo">
+      <img src="../images/logo.png" alt="PLP Logo">
+    </div>
+
+    <h2>Create Account</h2>
+    <p class="subtitle">Get Started with PLP Facial Monitor</p>
+
+    <form id="signupForm" novalidate>
+
+      <div class="input-group">
+        <input type="text" placeholder="Full Name" required>
+      </div>
+
+      <div class="input-group">
+        <input type="email" placeholder="Email" required>
+      </div>
+
+      <div class="input-group">
+        <div class="input-wrapper">
+          <input type="password" id="password" placeholder="Password" required>
+          <i class="fa-solid fa-eye-slash toggle-password" data-target="password"></i>
+        </div>
+      </div>
+
+      <div class="input-group">
+        <div class="input-wrapper">
+          <input type="password" id="confirm" placeholder="Confirm Password" required>
+          <i class="fa-solid fa-eye-slash toggle-password" data-target="confirm"></i>
+        </div>
+      </div>
+
+      <button class="btn">Sign Up</button>
+
+      <div class="footer">
+        Already have an Account? <a href="loginpage.html">Login</a>
+      </div>
+
+    </form>
+</div>
+
+<script>
+  $(function(){
+  $(".toggle-password").on("click", function(){
+    const target = $("#" + $(this).data("target"));
+    const isPwd = target.attr("type") === "password";
+    target.attr("type", isPwd ? "text" : "password");
+    $(this).toggleClass("fa-eye fa-eye-slash");
+  });
+});
+
+</script>
+
+</body>
+</html>

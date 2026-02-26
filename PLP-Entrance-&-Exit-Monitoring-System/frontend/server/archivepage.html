@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PLP Facial Monitor - Archive</title>
+    <link rel="icon" href="../images/logosmallplp.png">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/sidebar.css">
+    <link rel="stylesheet" href="../css/logout-modal.css">
+    <link rel="stylesheet" href="../css/profile-Dropdownsettings.css">
+
+    <script>
+        (function() {
+            const savedState = localStorage.getItem('plp_sidebar_state');
+            if (window.innerWidth > 768 && savedState === 'collapsed') {
+                document.documentElement.classList.add('sidebar-is-collapsed');
+            }
+        })();
+    </script>
+
+    <style>
+   :root {
+            --primary-dark: #064e3b; 
+            --sidebar-green: #1a4331; 
+            --header-green: #0a7b3d;
+            --white: #ffffff;
+            --accent-yellow: #facc15;
+            --card-green: #9ae6b4;
+            --card-orange: #fbd38d;
+            --card-red: #feb2b2;
+            --sidebar-width-expanded: 260px;
+            --sidebar-width-collapsed: 80px;
+            
+            /* Specific Colors matched from image */
+            --alert-success: #00c853;
+            --alert-success-bg: #99e9c4;
+            --alert-success-text: #064e3b;
+            
+            --alert-warning: #ff6d00;
+            --alert-warning-bg: #ffccbc;
+            --alert-warning-text: #7b341e;
+            
+            --alert-info: #2962ff;
+            --alert-info-bg: #c5cae9;
+            
+            --alert-purple: #2100bc;
+            --alert-purple-bg: #a399e4;
+            --alert-purple-text: #1a0066;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }      :root {
+            --primary-dark: #064e3b; 
+            --sidebar-green: #1a4331; 
+            --header-green: #0a7b3d;
+            --white: #ffffff;
+            --accent-yellow: #facc15;
+            --sidebar-width-expanded: 260px;
+        }
+
+        /* Filter Section */
+        .filter-section { background: white; border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .filter-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px; }
+        .search-box { position: relative; flex: 1; max-width: 400px; }
+        .search-box i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #999; }
+        .search-box input { width: 100%; padding: 10px 15px 10px 35px; border: 1px solid #ddd; border-radius: 20px; font-size: 0.85rem; }
+        .export-btn { background: #ffcc00; color: #333; border: none; padding: 10px 20px; border-radius: 20px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+       /* Filter Controls Fix */
+
+        .filter-controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 5px;
+            align-items: end;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        .filter-group label {
+            margin-bottom: 6px;
+            font-weight: 700;
+            font-size: 0.75rem ;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            color: #1a4331;
+        }
+        /* Fix Date Range layout */
+        .filter-group .date-range {
+            display: flex;
+            gap: 1px;
+        }
+
+        .filter-group .date-range input {
+            flex: 1;
+            min-width: 0;
+
+        }
+
+        /* Prevent overlapping inputs */
+        .filter-group input,
+        .filter-group select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1.5px solid #ccc;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            box-sizing: border-box;
+        }
+
+        /* Table Section */
+        .table-container { background: white; border-radius: 12px; padding: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); overflow-x: auto; }
+        .table-header-actions { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .results-count { font-weight: bold; color: #333; font-size: 0.95rem; }
+        .btn-group { display: flex; gap: 10px; }
+        .btn-reset { background: #1a4331; color: white; border: none; padding: 8px 15px; border-radius: 8px; cursor: pointer; font-size: 0.85rem; }
+        .btn-apply { background: #ffcc00; color: #333; border: none; padding: 8px 15px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 0.85rem; }
+
+        table { width: 100%; border-collapse: collapse; min-width: 1000px; }
+        thead th { text-align: left; padding: 12px; border-bottom: 2px solid #eee; color: #666; font-size: 0.8rem; }
+        tbody tr { border-bottom: 1px solid #eee; }
+        tbody td { padding: 12px; font-size: 0.8rem; color: #444; }
+        .std-name { font-weight: bold; color: #000; }
+        .status-badge { padding: 4px 10px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; display: inline-block; width: 80px; text-align: center; }
+        .status-in { background: #dcfce7; color: #166534; }
+        .status-out { background: #fee2e2; color: #991b1b; }
+        .gate-badge { font-weight: bold; font-size: 0.7rem; }
+        .gate-east { color: #166534; }
+        .gate-west { color: #991b1b; }
+        .action-icons { display: flex; gap: 12px; color: #666; }
+        .action-icons i { cursor: pointer; padding: 5px; transition: 0.2s; }
+        .action-icons i:hover { color: var(--header-green); transform: scale(1.2); }
+
+        /* MODAL STYLES */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.7); display: none; justify-content: center;
+            align-items: center; z-index: 9999; backdrop-filter: blur(4px);
+        }
+        .modal-overlay.active { display: flex; }
+        .student-modal {
+            background: white; width: 90%; max-width: 600px; border-radius: 30px;
+            border: 5px solid #258032; position: relative; padding: 50px 30px 30px;
+            text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            animation: modalSlideUp 0.3s ease;
+        }
+        @keyframes modalSlideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        
+        .modal-logo {
+                               position: absolute;
+            top: -45px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 100px;
+            background: white;
+            border-radius: 50%;
+            padding: 5px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .modal-logo img { width: 100%; height: 100%; object-fit: contain; }
+        .back-btn {
+            position: absolute; top: 20px; left: 25px; background: none; border: none;
+            color: #1a4331; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 5px;
+        }
+        .modal-title { margin-top: 20px; font-size: 1.8rem; color: #258032; font-weight: bold; margin-bottom: 25px; }
+        .modal-grid { display: grid; grid-template-columns: 150px 1fr; gap: 20px; text-align: left; margin-bottom: 20px; }
+        .modal-photo { width: 150px; height: 170px; border: 1px solid #ccc; border-radius: 15px; overflow: hidden; background: #f0f0f0; }
+        .modal-photo img { width: 100%; height: 100%; object-fit: cover; }
+        .info-field { margin-bottom: 12px; }
+        .info-field label { display: block; font-size: 0.75rem; font-weight: bold; color: #333; margin-bottom: 4px; }
+        .val-box { background: var(--input-bg); padding: 10px 15px; border-radius: 12px; font-size: 0.85rem; color: #444; border: none; width: 100%; }
+        .modal-row { display: flex; gap: 10px; }
+        .modal-row .info-field { flex: 1; }
+        .modal-footer-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; text-align: left; }
+        .badge-input { width: 100%; padding: 12px; border-radius: 15px; text-align: center; font-weight: bold; border: none; font-size: 0.8rem; }
+        .bg-yellow { background: var(--btn-yellow); color: #333; }
+        .bg-green { background: var(--btn-green); color: white; }
+        .bg-blue { background: var(--btn-blue); color: white; }
+        .full-width-field { grid-column: span 2; }
+        .update-btn-container { margin-top: 20px; }
+        .update-btn { background: var(--btn-yellow); color: #333; border: none; padding: 12px 30px; border-radius: 25px; font-weight: bold; cursor: pointer; display: none; align-items: center; gap: 8px; margin: 0 auto; }
+
+        .sidebar-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 850; }
+        .sidebar-overlay.active { display: block; }
+
+        @media (max-width: 768px) {
+            .sidebar { left: -260px; }
+            .sidebar.active { left: 0; }
+            .content { margin-left: 0 !important; }
+            .modal-grid { grid-template-columns: 1fr; }
+            .modal-photo { margin: 0 auto; }
+        }
+    </style>
+</head>
+<body>
+
+      <header>
+        <div class="header-left">
+            <button id="menu-toggle" title="Toggle Menu">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="logo-container">
+                <img src="../images/logosmallplp.png" alt="PLP Logo">
+                <div class="brand-text">
+                    <h1>PLP Facial Monitor</h1>
+                    <p>PAMANTASAN NG LUNGSOD NG PASIG</p>
+                </div>
+            </div>
+        </div>
+        <div class="header-right">
+            <span id="live-date">load...</span>
+            <span id="live-time">00:00:00 AM</span>
+        </div>
+    </header>
+
+        <div class="main-container">
+        <div class="sidebar-overlay" id="sidebar-overlay"></div>
+        
+    <nav class="sidebar" id="sidebar">
+        <!-- Wrap user section for click event -->
+        <div class="user-section" id="profileToggle">
+            <div class="user-main-display">
+                <div class="avatar-circle">HN</div>
+                <div class="user-info">
+                    <h4>Harlene Nebasa</h4>
+                    <p>nebasa_harlene@plpasig.edu.ph</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- The Dropdown Menu Items -->
+        <div class="profile-dropdown" id="profileMenu">
+            <a href="../server/profile-settings.html" class="dropdown-item">
+                <i class="fas fa-user-cog"></i>
+                <span>Profile Settings</span>
+            </a>
+            <a href="../server/change-password.html" class="dropdown-item">
+                <i class="fas fa-key"></i>
+                <span>Create New Password</span>
+            </a>
+            <a href="../server/security-logs.html" class="dropdown-item">
+                <i class="fas fa-shield-alt"></i>
+                <span>Security Passwords Changed</span>
+            </a>
+        </div>
+
+    <div class="nav-menu">
+                <a href="../server/dashboardpage.html" class="nav-item">
+                    <i class="fas fa-th-large"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="../server/studentregistrationpage.html" class="nav-item">
+                    <i class="fas fa-user-circle"></i>
+                    <span>Registration</span>
+                </a>
+                <a href="../server/studentrecords.html" class="nav-item">
+                    <i class="fas fa-folder"></i>
+                    <span>Student Records</span>
+                </a>
+                <a href="../server/archivepage.html" class="nav-item active">
+                    <i class="fas fa-archive"></i>
+                    <span>Archive</span>
+                </a>
+                <a href="../server/loginpage.html" class="nav-item logout" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </nav>
+
+        <!-- Logout Confirmation Modal -->
+        <div class="logout-modal" id="logoutModal">
+            <div class="logout-box">
+                <h3>Confirm Logout</h3>
+                <p>Are you sure you want to logout?</p>
+                <div class="logout-actions">
+                    <button class="cancel-btn" id="cancelLogout">Cancel</button>
+                    <button class="confirm-btn" id="confirmLogout">Yes, Logout</button>
+                </div>
+            </div>
+        </div>
+        <main class="content">
+            <div class="content-header">
+                <div class="title-group">
+                    <h2>Archive Records</h2>
+                    <p>LIST OF RECORDS THAT ENTRANCE AND EXIT THE SYSTEM</p>
+                </div>
+                              <a href="../server/dashboardpage.html" class="home-btn">
+                    <i class="fas fa-home"></i> Home
+                </a>
+            </div>
+
+
+            <div class="filter-section">
+                <div class="filter-top">
+                    <h3>Filter Records</h3>
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="globalSearch" placeholder="Search by Name, ID, or Course...">
+                    </div>
+                    <button class="export-btn"><i class="fas fa-download"></i> Export</button>
+                </div>
+                <div class="filter-controls">
+                    <div class="filter-group">
+                        <label>Date Range (Start - End)</label>
+                        <div class="date-range">
+                        <input type="date" id="filterStartDate">
+                        <input type="date" id="filterEndDate">
+                    </div>
+                    </div>
+                    <div class="filter-group">
+                        <label>Course</label>
+                        <select id="filterCourse">
+                            <option value="All Courses">All Courses</option>
+                            <option value="BSIT">BSIT</option>
+                            <option value="BSCS">BSCS</option>
+                            <option value="BSN">BSN</option>
+                            <option value="BSBA">BSBA</option>
+                            <option value="BSED">BSED</option>
+                            <option value="BSHM">BSHM</option>
+                            <option value="BSEE">BSEE</option>
+                            <option value="BSPSYCH">BSPSYCH</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Year Level</label>
+                        <select id="filterYear">
+                            <option value="All Years">All Years</option>
+                            <option value="1st Year">1st Year</option>
+                            <option value="2nd Year">2nd Year</option>
+                            <option value="3rd Year">3rd Year</option>
+                            <option value="4th Year">4th Year</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Department</label>
+                        <select id="filterDepartment">
+                            <option value="All Departments">All Departments</option>
+                            <option value="CCS Department">CCS Department</option>
+                            <option value="CON Department">CON Department</option>
+                            <option value="CBA Department">CBA Department</option>
+                            <option value="CAS Department">CAS Department</option>
+                            <option value="COE Department">COE Department</option>
+                            <option value="COEd Department">COEd Department</option>
+                            <option value="CIHM Department">CIHM Department</option>
+                        </select>
+                    </div>
+                        <div class="filter-group">
+                            <label>Student Status</label>
+                            <select id="filterStudentStatus">
+                                <option value="All Student Status">All Student Status</option>
+                                <option value="Regular">Regular</option>
+                                <option value="Irregular">Irregular</option>
+                                <option value="Transferee">Transferee</option>
+                                <option value="Alumni">Alumni</option>
+                            </select>
+                        </div>
+
+                    
+                    <div class="filter-group">
+                        <label>Attendance Status</label>
+                        <select id="filterStatus">
+                            <option value="All Status">All Status</option>
+                            <option value="TIME IN">TIME IN</option>
+                            <option value="TIME OUT">TIME OUT</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <div class="table-header-actions">
+                    <div class="results-count" id="resultsCount">Showing 0 Results</div>
+                    <div class="btn-group">
+                        <button class="btn-reset" id="btnReset">Reset</button>
+                        <button class="btn-apply" id="btnApply">Apply Filters</button>
+                    </div>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Timestamp</th>
+                            <th>Student Name</th>
+                            <th>Student ID</th>
+                            <th>Student Status</th>
+                            <th>Course</th>
+                            <th>Year</th>
+                            <th>Department</th>
+                            <th>Status</th>
+                            <th>Gate</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="archiveTableBody"></tbody>
+                                         <!-- JS handles data rendering -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </main>
+                        </div>
+
+    <!-- STUDENT DETAILS MODAL -->
+    <div class="modal-overlay" id="studentModalOverlay">
+        <div class="student-modal">
+            <div class="modal-logo">
+                <img src="../images/logo.png" alt="PLP Logo">
+            </div>
+            
+            <button class="back-btn" onclick="closeModal()">
+                <i class="fas fa-reply"></i> Back
+            </button>
+
+            <h2 class="modal-title">Student Details</h2>
+
+            <div class="modal-grid">
+                <div class="modal-photo">
+                    <img id="modalPhoto" src="../images/kim.png" alt="Student">
+                </div>
+                <div class="modal-fields">
+                    <div class="info-field">
+                        <label>Full name</label>
+                        <input type="text" id="modalFullName" class="val-box" readonly>
+                    </div>
+                 <div class="info-field">
+                    <label>Student Status</label>
+                    <div id="studentStatusWrapper">
+                        <input type="text" id="modalStudentStatus" class="val-box" readonly>
+                    </div>
+                    <div class="modal-row">
+                        <div class="info-field">
+                            <label>Student ID</label>
+                            <input type="text" id="modalID" class="val-box" readonly>
+                        </div>
+                        <div class="info-field">
+                            <label>Year Level</label>
+                            <div id="yearWrapper">
+                                <input type="text" id="modalYear" class="val-box" readonly>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-row">
+                        <div class="info-field">
+                            <label>Course</label>
+                            <div id="courseWrapper">
+                                <input type="text" id="modalCourse" class="val-box" readonly>
+                            </div>
+                        </div>
+                        <div class="info-field">
+                            <label>Department</label>
+                            <div id="deptWrapper">
+                                <input type="text" id="modalDept" class="val-box" readonly>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </div>
+
+            <div class="modal-footer-fields">
+                <div class="info-field">
+                    <label>Attendance Status</label>
+                    <input type="text" id="modalStatus" class="badge-input bg-yellow" readonly>
+                </div>
+                <div class="info-field">
+                    <label>Gate Location</label>
+                    <div id="gateWrapper">
+                         <input type="text" id="modalGate" class="badge-input bg-green" readonly>
+                    </div>
+                </div>
+                <div class="info-field full-width-field">
+                    <label>Timestamp</label>
+                    <input type="text" id="modalTimestamp" class="badge-input bg-blue" readonly>
+                </div>
+            </div>
+
+            <div class="update-btn-container">
+                <button class="update-btn" id="updateBtn">
+                    <i class="fas fa-save"></i> Save Changes
+                </button>
+            </div>
+        </div>
+    </div>
+
+<script src="../js/sidebar.js"></script>
+<script src="../js/logout-modal.js"></script>
+<script src="../js/profile-Dropdownsettings.js"></script> 
+
+ <script>
+const archiveTableBody = document.getElementById('archiveTableBody');
+const resultsCountText = document.getElementById('resultsCount');
+
+function loadArchivedRecords() {
+    const archived = JSON.parse(localStorage.getItem('ARCHIVED_RECORDS')) || [];
+
+    archiveTableBody.innerHTML = '';
+
+    archived.forEach((item, index) => {
+        const statusClass = item.status === 'TIME IN' ? 'status-in' : 'status-out';
+        const gateClass = item.gate.includes('EAST') ? 'gate-east' : 'gate-west';
+
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${item.timestamp}</td>
+            <td class="std-name">${item.name}</td>
+            <td>${item.id}</td>
+            <td>${item.studentStatus}</td>
+            <td>${item.course}</td>
+            <td>${item.year}</td>
+            <td>${item.dept}</td>
+            <td><span class="status-badge ${statusClass}">${item.status}</span></td>
+            <td><span class="gate-badge ${gateClass}">${item.gate}</span></td>
+            <td class="action-icons">
+                <i class="fas fa-undo restore-btn" title="Restore" data-index="${index}"></i>
+            </td>
+        `;
+        archiveTableBody.appendChild(row);
+    });
+
+    resultsCountText.textContent = `Showing ${archived.length} Results`;
+
+    // Restore button
+    document.querySelectorAll('.restore-btn').forEach(btn => {
+        btn.onclick = () => {
+            const i = btn.getAttribute('data-index');
+            restoreRecord(i);
+        };
+    });
+}
+
+    function restoreRecord(index) {
+        let archived = JSON.parse(localStorage.getItem('ARCHIVED_RECORDS')) || [];
+        let master = JSON.parse(localStorage.getItem('MASTER_RECORDS')) || [];
+
+        const record = archived.splice(index, 1)[0];
+        master.push(record);
+
+        localStorage.setItem('ARCHIVED_RECORDS', JSON.stringify(archived));
+        localStorage.setItem('MASTER_RECORDS', JSON.stringify(master));
+
+        loadArchivedRecords();
+    }
+
+    loadArchivedRecords();
+    
+</script>
+</body>
+</html>

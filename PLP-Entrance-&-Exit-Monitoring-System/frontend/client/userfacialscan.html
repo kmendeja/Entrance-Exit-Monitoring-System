@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PLP Multiple Facial Monitor</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-green: #064e3b;
+            --secondary-green: #14532d;
+            --accent-yellow: #facc15;
+            --light-bg: #f8fafc;
+            --text-slate: #334155;
+            --error-red: #ef4444;
+            --success-green: #22c55e;
+            --warning-orange: #f59e0b;
+        }
+
+        body {
+            background: linear-gradient(
+                rgba(10, 123, 61, 1),
+                rgba(37, 99, 45, 1),
+                rgba(255, 222, 89, 1)
+            );
+            background-color: #000;
+            min-height: 100vh;
+            font-family: 'Poppins', sans-serif;
+            overflow-x: hidden;
+            color: white;
+        }
+
+        /* Header */
+        .header-bar {
+            padding: 2rem 1rem 1rem 1rem;
+            display: flex;
+            flex-direction: column;  
+            align-items: center;     
+            text-align: center;
+            gap: 0.5rem;
+        }
+
+        .header-logo {
+            width: 70px;
+            height: 70px;
+            object-fit: contain;
+        }
+
+        .header-title h1 {
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: white;
+        }
+
+        /* Main Layout */
+        .dashboard-container {
+            display: grid;
+            grid-template-columns: 1fr 320px;
+            gap: 1.5rem;
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+
+        @media (max-width: 1024px) {
+            .dashboard-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Left Side: Scanner */
+        .scanner-section {
+            background-color: white;
+            border-radius: 2rem;
+            padding: 1.5rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            color: var(--text-slate);
+            position: relative;
+        }
+
+        .video-box {
+            background-color: #000;
+            border-radius: 1.5rem;
+            width: 100%;
+            aspect-ratio: 16/9;
+            position: relative;
+            overflow: hidden;
+            border: 4px solid #cbd5e1;
+        }
+
+        #webcam {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scaleX(-1);
+        }
+
+        #overlay-canvas {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 5;
+            transform: scaleX(-1);
+        }
+
+        .scan-line {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 4px;
+            background: var(--accent-yellow);
+            box-shadow: 0 0 15px 5px rgba(250, 204, 21, 0.5);
+            z-index: 10;
+            animation: scan 3s linear infinite;
+        }
+
+        @keyframes scan { 0% { top: 0%; } 50% { top: 100%; } 100% { top: 0%; } }
+
+        /* Right Side: Logs */
+        .logs-section {
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            height: 600px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logs-title {
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--accent-yellow);
+            position: center;
+            top: 0;
+            background: rgba(0,0,0,0.1);
+            padding-bottom: 5px;
+        }
+
+        .log-entry {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 10px;
+            margin-bottom: 10px;
+            font-size: 0.85rem;
+            border-left: 4px solid var(--success-green);
+            animation: slideIn 0.3s ease-out;
+            flex-shrink: 0;
+        }
+
+        @keyframes slideIn { from { transform: translateX(20px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+        .log-name { font-weight: 700; display: block; color: white; }
+        .log-time { font-size: 0.75rem; color: #cbd5e1; }
+        .log-status { color: var(--success-green); font-weight: bold; float: right; }
+
+        /* Clock & Status */
+        .time-display { text-align: center; margin-bottom: 1rem; }
+        .clock { font-size: 2rem; font-weight: 800; color: var(--accent-yellow); }
+        .date { font-size: 1rem; opacity: 0.9; }
+
+        .system-status {
+            margin-top: 1rem;
+            text-align: center;
+            font-weight: 700;
+            color: var(--secondary-green);
+        }
+
+        /* Success Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 2rem;
+            text-align: center;
+            color: var(--text-slate);
+            max-width: 400px;
+            width: 90%;
+            position: relative;
+            border-bottom: 8px solid var(--success-green);
+        }
+
+        /* Stacked Notifications Container */
+        #notification-container {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 200;
+            display: flex;
+            flex-direction: column-reverse;
+            gap: 10px;
+            pointer-events: none;
+        }
+
+        .mini-popup {
+            background: white;
+            padding: 15px;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            border-left: 6px solid var(--success-green);
+            color: var(--text-slate);
+            width: 250px;
+            animation: slideInLeft 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+            pointer-events: auto;
+        }
+
+        @keyframes slideInLeft { from { transform: translateX(-100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+    <header class="header-bar">
+        <img src="../images/logosmallplp.png" alt="PLP Logo" class="header-logo">
+        <div class="header-title">
+            <h1>PLP Facial Monitor</h1>
+            <p>PAMANTASAN NG LUNGSOD NG PASIG</p>
+        </div>
+    </header>
+
+    <div class="time-display">
+        <div class="clock" id="clock-display">00:00:00</div>
+        <div class="date" id="date-display">...</div>
+    </div>
+
+    <div class="dashboard-container">
+        <!-- Main Scanner Area -->
+        <div class="scanner-section">
+            <div class="video-box" id="video-container">
+                <div id="loader" style="position: absolute; z-index: 20; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center;">
+                    <i class="fas fa-spinner fa-spin fa-3x" style="color: var(--accent-yellow);"></i>
+                    <p style="margin-top: 10px; font-weight: bold; color: var(--accent-yellow);">LOAD NG AI MODELS...</p>
+                </div>
+                <div class="scan-line"></div>
+                <video id="webcam" autoplay playsinline muted></video>
+                <canvas id="overlay-canvas"></canvas>
+            </div>
+            <div class="system-status" id="system-status">
+                <i class="fas fa-circle" style="color: var(--warning-orange)"></i> SYSTEM INITIALIZING...
+            </div>
+        </div>
+
+        <!-- Recent Logs Area -->
+        <div class="logs-section">
+            <div class="logs-title">
+                <i class="fas fa-history"></i> RECENT LOGS
+            </div>
+            <div id="logs-container">
+                <!-- Logs will appear here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Container for multiple popups -->
+    <div id="notification-container"></div>
+
+    <!-- Main Success Modal (for primary focus) -->
+    <div id="modal-overlay" class="modal-overlay">
+        <div class="modal-content">
+            <h2 style="color: var(--secondary-green); font-weight: 900;">VERIFIED</h2>
+            <div style="margin: 1.5rem 0;">
+                <p style="font-size: 1.2rem; font-weight: 700;" id="modal-name">STUDENT NAME</p>
+                <p style="color: #64748b;" id="modal-id">23-XXXXX</p>
+                <p style="color: #64748b;" id="modal-course">BSIT</p>
+                <p style="color: #64748b;" id="modal-year">YEAR</p>
+
+            </div>
+            <div style="background: var(--success-green); color: white; padding: 10px; border-radius: 10px; font-weight: bold;">
+                TIME IN RECORDED
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const video = document.getElementById('webcam');
+        const canvas = document.getElementById('overlay-canvas');
+        const logsContainer = document.getElementById('logs-container');
+        const systemStatus = document.getElementById('system-status');
+        const modal = document.getElementById('modal-overlay');
+        const notificationContainer = document.getElementById('notification-container');
+
+        const students = [
+    { 
+        name: 'Kim B. Mendeja', 
+        id: '23-00134', 
+        course: 'BSIT',
+        year: '2nd Yr',
+    },
+    { 
+        name: 'Hans M. Manuzon', 
+        id: '23-00345', 
+        course: 'BSN', 
+        year: '3rd Yr',
+    },
+    { 
+        name: 'Dwayne Raphael C. Bacarra', 
+        id: '24-00999', 
+        course: 'BSBA',
+        year: '1st Yr',
+    },
+    { 
+        name: 'Chryslie Areyl M. Jadloc', 
+        id: '21-00555', 
+        course: 'BSEE',
+        year: '2nd Yr', 
+    },
+    { 
+        name: 'Harlene G. Nebasa', 
+        id: '23-00678', 
+        course: 'BSIT',
+        year: '4th Yr', 
+    }
+        ];
+
+        // Track last detection time per face detected in the same frame
+        let lastGlobalLogTime = 0;
+        let cooldownActive = false;
+
+        function updateTime() {
+            const now = new Date();
+            document.getElementById('clock-display').innerText = now.toLocaleTimeString();
+            document.getElementById('date-display').innerText = now.toDateString();
+        }
+        setInterval(updateTime, 1000);
+        updateTime();
+
+        async function init() {
+            try {
+                const MODEL_URL = 'https://justadudewhohacks.github.io/face-api.js/models';
+                await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);
+                await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL);
+                startCamera();
+            } catch (e) {
+                console.error(e);
+                systemStatus.innerHTML = '<i class="fas fa-times-circle" style="color: var(--error-red)"></i> ERROR LOADING MODELS';
+            }
+        }
+
+        async function startCamera() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { width: 1280, height: 720 } 
+                });
+                video.srcObject = stream;
+                
+                video.addEventListener('play', () => {
+                    document.getElementById('loader').classList.add('hidden');
+                    systemStatus.innerHTML = '<i class="fas fa-check-circle" style="color: var(--success-green)"></i> SCANNER ACTIVE';
+                    
+                    const displaySize = { width: video.clientWidth, height: video.clientHeight };
+                    faceapi.matchDimensions(canvas, displaySize);
+                    
+                    setInterval(async () => {
+                        await detectFaces(displaySize);
+                    }, 100);
+                });
+            } catch (e) {
+                systemStatus.innerHTML = '<i class="fas fa-exclamation-triangle" style="color: var(--error-red)"></i> CAMERA ACCESS DENIED';
+            }
+        }
+
+        async function detectFaces(displaySize) {
+            const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions());
+            const resizedDetections = faceapi.resizeResults(detections, displaySize);
+            
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Loop through ALL detections in the frame
+            resizedDetections.forEach((detection, index) => {
+                const box = detection.box;
+                ctx.strokeStyle = index % 2 === 0 ? '#facc15' : '#22c55e'; // Alternate colors for multi-face
+                ctx.lineWidth = 4;
+                ctx.strokeRect(box.x, box.y, box.width, box.height);
+
+                // Multiple Log Trigger
+                const currentTime = Date.now();
+                // We allow multiple logs if they appear in the same detection frame, 
+                // but we add a global cooldown so it doesn't spam every 100ms.
+                if (currentTime - lastGlobalLogTime > 6000) {
+                    // Simulate logging for each face found in this frame
+                    triggerMultipleLogs(resizedDetections.length);
+                    lastGlobalLogTime = currentTime;
+                }
+            });
+        }
+
+        function triggerMultipleLogs(count) {
+            // Randomly pick unique students for the count detected
+            const shuffled = [...students].sort(() => 0.5 - Math.random());
+            const selected = shuffled.slice(0, count);
+
+            selected.forEach((student, i) => {
+                // Delay each log slightly for visual effect
+                setTimeout(() => {
+                    addLog(student);
+                }, i * 500);
+            });
+        }
+
+        function addLog(student) {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+            // 1. Create Mini Notification (Multiple popups)
+            const miniPopup = document.createElement('div');
+            miniPopup.className = 'mini-popup';
+            miniPopup.innerHTML = `
+                <div style="font-weight: 800; font-size: 0.9rem; color: var(--secondary-green)">VERIFIED</div>
+                <div style="font-weight: 700;">${student.name}</div>
+                <div style="font-size: 0.75rem; color: #64748b;">${student.id}</div>
+                <div style="font-size: 0.75rem; color: #64748b;">${student.course} ${student.year}</div>
+
+            `;
+            notificationContainer.appendChild(miniPopup);
+            
+            // Remove mini popup after 4 seconds
+            setTimeout(() => {
+                miniPopup.style.opacity = '0';
+                miniPopup.style.transform = 'translateX(-20px)';
+                setTimeout(() => miniPopup.remove(), 400);
+            }, 4000);
+
+            // 2. Add to Recent Logs Sidebar
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.innerHTML = `
+                <span class="log-status">IN</span>
+                <span class="log-name">${student.name}</span>
+                <span class="log-time">${timeStr}</span>
+                <span class="log-time">${student.id} • ${student.course} ${student.year}</span>
+            `;
+            
+            logsContainer.prepend(entry);
+            if (logsContainer.children.length > 20) {
+                logsContainer.removeChild(logsContainer.lastChild);
+            }
+        }
+
+        window.addEventListener('resize', () => {
+            const displaySize = { width: video.clientWidth, height: video.clientHeight };
+            faceapi.matchDimensions(canvas, displaySize);
+        });
+
+        window.onload = init;
+    </script>
+    
+</body>
+</html>

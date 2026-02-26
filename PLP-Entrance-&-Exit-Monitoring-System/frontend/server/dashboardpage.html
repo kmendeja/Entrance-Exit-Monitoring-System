@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PLP Facial Monitor - Dashboard</title>
+    <link rel="icon" href="../images/logosmallplp.png">
+
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js Library -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <link rel="stylesheet" href="../css/sidebar.css">
+    <link rel="stylesheet" href="../css/logout-modal.css">
+    <link rel="stylesheet" href="../css/profile-Dropdownsettings.css">
+    
+    <script>
+        (function() {
+            const savedState = localStorage.getItem('plp_sidebar_state');
+            if (window.innerWidth > 768 && savedState === 'collapsed') {
+                document.documentElement.classList.add('sidebar-is-collapsed');
+            }
+        })();
+    </script>
+    
+    <style>
+        :root {
+            --primary-dark: #064e3b; 
+            --sidebar-green: #1a4331; 
+            --header-green: #0a7b3d;
+            --white: #ffffff;
+            --accent-yellow: #facc15;
+            --card-green: #9ae6b4;
+            --card-orange: #fbd38d;
+            --card-red: #feb2b2;
+            --sidebar-width-expanded: 260px;
+            --sidebar-width-collapsed: 80px;
+            
+            --alert-success: #00c853;
+            --alert-success-bg: #99e9c4;
+            --alert-success-text: #064e3b;
+            --alert-warning: #ff6d00;
+            --alert-warning-bg: #ffccbc;
+            --alert-warning-text: #7b341e;
+            --alert-info: #2962ff;
+            --alert-info-bg: #c5cae9;
+            --alert-purple: #2100bc;
+            --alert-purple-bg: #a399e4;
+            --alert-purple-text: #1a0066;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        /* Overview Section */
+        .overview-card {
+            background-color: var(--white);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+            margin-top: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .overview-top {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        @media (min-width: 640px) {
+            .overview-top { flex-direction: row; justify-content: space-between; align-items: center; }
+        }
+
+        .toggle-group {
+            background: #1a202c;
+            padding: 3px;
+            border-radius: 12px;
+            display: flex;
+            align-self: flex-start;
+        }
+
+        .toggle-btn {
+            padding: 6px 15px;
+            border: none;
+            background: none;
+            color: #a0aec0;
+            cursor: pointer;
+            border-radius: 9px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-btn.active { background: #065f46; color: white; }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+
+        @media (min-width: 640px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (min-width: 1024px) { .stats-grid { grid-template-columns: repeat(3, 1fr); } }
+
+        .stat-card {
+            border-radius: 20px;
+            padding: 25px 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            position: relative;
+            min-height: 120px;
+        }
+
+        .stat-card.green { background-color: var(--card-green); }
+        .stat-card.orange { background-color: var(--card-orange); }
+        .stat-card.red { background-color: var(--card-red); }
+
+        .stat-icon-wrapper { display: flex; align-items: center; gap: 15px; }
+        .stat-divider { width: 2px; height: 40px; background-color: rgba(0, 0, 0, 0.1); }
+        .stat-icon-main { font-size: 2rem; opacity: 0.5; color: #1a202c; }
+        .stat-info { display: flex; flex-direction: column; }
+        .stat-label { font-size: 0.9rem; font-weight: 800; color: #2d3748; }
+        .stat-value { font-size: 2.5rem; font-weight: 900; color: #1a202c; line-height: 1; }
+        .stat-change { position: absolute; bottom: 8px; font-size: 0.7rem; font-weight: 700; color: #4a5568; }
+
+        /* GRAPH SECTION STYLING */
+        .analytics-panel {
+            background-color: var(--white);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        .analytics-header {
+            margin-bottom: 20px;
+        }
+        .analytics-header h3 {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: #1a202c;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+
+        /* Panels Row */
+        .panels-row {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        @media (min-width: 1100px) { .panels-row { grid-template-columns: 1.15fr 1fr; } }
+
+        .panel { border-radius: 25px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .panel.recent { background-color: var(--accent-yellow); }
+        .panel.alerts { background-color: var(--white); }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .panel-header h3 { font-size: 1.1rem; font-weight: 800; color: #1a202c; }
+
+        .activity-list { display: flex; flex-direction: column; gap: 10px; }
+        .activity-card {
+            background: white;
+            border-radius: 15px;
+            padding: 12px 15px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            position: relative;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        .activity-icon { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; flex-shrink: 0; }
+        .activity-details { flex: 1; padding-right: 20px; }
+        .activity-details h4 { font-size: 0.9rem; color: #1a202c; font-weight: 700; }
+        .activity-details p { font-size: 0.8rem; color: #2d3748; font-weight: 600; margin-bottom: 1px; }
+        .activity-time { font-size: 0.65rem; color: #718096; margin-top: 4px; font-weight: 600; }
+
+        @media (min-width: 480px) { .activity-time { position: absolute; right: 15px; bottom: 10px; } }
+
+        .alert-pill { border-radius: 25px; display: flex; overflow: hidden; min-height: 80px; margin-bottom: 10px; align-items: stretch; }
+        .alert-pill.success { background-color: var(--alert-success-bg); color: var(--alert-success-text); }
+        .alert-pill.warning { background-color: var(--alert-warning-bg); color: var(--alert-warning-text); }
+        .alert-pill.info { background-color: var(--alert-purple-bg); color: var(--alert-purple-text); }
+
+        .pill-icon { width: 60px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; border-radius: 25px; }
+        .pill-icon i { font-size: 1.8rem; color: white; }
+        .success .pill-icon { background-color: var(--alert-success); }
+        .warning .pill-icon { background-color: var(--alert-warning); }
+        .info .pill-icon { background-color: var(--alert-purple); }
+
+        .pill-content { flex: 1; padding: 12px 15px; display: flex; flex-direction: column; justify-content: center; position: relative; }
+        .pill-content h4 { font-size: 1rem; font-weight: 800; color: inherit; margin-bottom: 2px; }
+        .pill-content p { font-size: 0.75rem; color: inherit; opacity: 0.85; font-weight: 600; }
+        .pill-meta { display: block; margin-top: 4px; font-size: 0.65rem; color: inherit; opacity: 0.7; font-weight: 600; }
+        @media (min-width: 640px) { .pill-meta { position: absolute; right: 15px; bottom: 8px; } }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-left">
+            <button id="menu-toggle" title="Toggle Menu">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="logo-container">
+                <img src="../images/logosmallplp.png" alt="PLP Logo">
+                <div class="brand-text">
+                    <h1>PLP Facial Monitor</h1>
+                    <p>PAMANTASAN NG LUNGSOD NG PASIG</p>
+                </div>
+            </div>
+        </div>
+        <div class="header-right">
+            <span id="live-date">load...</span>
+            <span id="live-time">00:00:00 AM</span>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <div class="sidebar-overlay" id="sidebar-overlay"></div>
+        
+        <nav class="sidebar" id="sidebar">
+            <div class="user-section" id="profileToggle">
+                <div class="user-main-display">
+                    <div class="avatar-circle">HN</div>
+                    <div class="user-info">
+                        <h4>Harlene Nebasa</h4>
+                        <p>nebasa_harlene@plpasig.edu.ph</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="profile-dropdown" id="profileMenu">
+                <a href="../server/profile-settings.html" class="dropdown-item">
+                    <i class="fas fa-user-cog"></i> <span>Profile Settings</span>
+                </a>
+                <a href="../server/change-password.html" class="dropdown-item">
+                    <i class="fas fa-key"></i> <span>Create New Password</span>
+                </a>
+                <a href="../server/security-logs.html" class="dropdown-item">
+                    <i class="fas fa-shield-alt"></i> <span>Security Logs</span>
+                </a>
+            </div>
+
+            <div class="nav-menu">
+                <a href="../server/dashboardpage.html" class="nav-item active">
+                    <i class="fas fa-th-large"></i> <span>Dashboard</span>
+                </a>
+                <a href="../server/studentregistrationpage.html" class="nav-item">
+                    <i class="fas fa-user-circle"></i> <span>Registration</span>
+                </a>
+                <a href="../server/studentrecords.html" class="nav-item">
+                    <i class="fas fa-folder"></i> <span>Student Records</span>
+                </a>
+                <a href="../server/archivepage.html" class="nav-item">
+                    <i class="fas fa-archive"></i> <span>Archive</span>
+                </a>
+                <a href="../server/loginpage.html" class="nav-item logout" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i> <span>Logout</span>
+                </a>
+            </div>
+        </nav>
+
+        <!-- Logout Confirmation Modal -->
+        <div class="logout-modal" id="logoutModal">
+            <div class="logout-box">
+                <h3>Confirm Logout</h3>
+                <p>Are you sure you want to logout?</p>
+                <div class="logout-actions">
+                    <button class="cancel-btn" id="cancelLogout">Cancel</button>
+                    <button class="confirm-btn" id="confirmLogout">Yes, Logout</button>
+                </div>
+            </div>
+        </div>
+
+        <main class="content">
+            <div class="content-header">
+                <div class="title-group">
+                    <h2>System Dashboard</h2>
+                    <p>COMPREHENSIVE MONITORING AND MANAGEMENT OVERVIEW</p>
+                </div>
+                <a href="../server/dashboardpage.html" class="home-btn">
+                    <i class="fas fa-home"></i> Home
+                </a>
+            </div>
+
+            <!-- Overview Section -->
+            <div class="overview-card">
+                <div class="overview-top">
+                    <h3 style="font-size: 1.1rem; font-weight: 800; color: #1a202c;">Real-time Statistics</h3>
+                    <div class="toggle-group">
+                        <button class="toggle-btn active" onclick="updateView('today')">Today</button>
+                        <button class="toggle-btn" onclick="updateView('week')">Week</button>
+                        <button class="toggle-btn" onclick="updateView('month')">Month</button>
+                    </div>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card green">
+                        <div class="stat-icon-wrapper">
+                            <i class="far fa-clock stat-icon-main"></i>
+                            <div class="stat-divider"></div>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-label">TIME IN</span>
+                            <span class="stat-value" id="val-timein">342</span>
+                        </div>
+                        <div class="stat-change">+12% from previous</div>
+                    </div>
+                    
+                    <div class="stat-card orange">
+                        <div class="stat-icon-wrapper">
+                            <i class="fas fa-walking stat-icon-main"></i>
+                            <div class="stat-divider"></div>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-label">TIME OUT</span>
+                            <span class="stat-value" id="val-timeout">342</span>
+                        </div>
+                        <div class="stat-change">+8% from previous</div>
+                    </div>
+
+                    <div class="stat-card red">
+                        <div class="stat-icon-wrapper">
+                            <i class="fas fa-user-secret stat-icon-main"></i>
+                            <div class="stat-divider"></div>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-label">UNREGISTERED</span>
+                            <span class="stat-value" id="val-unreg">7</span>
+                        </div>
+                        <div class="stat-change">-3 from previous</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- NEW GRAPH SECTION -->
+            <div class="analytics-panel">
+                <div class="analytics-header">
+                    <h3><i class="fas fa-chart-line" style="color: var(--header-green);"></i> Attendance & Detection Trends</h3>
+                </div>
+                <div class="chart-container">
+                    <canvas id="mainDashboardChart"></canvas>
+                </div>
+            </div>
+
+            <div class="panels-row">
+                <!-- Recent Activity Panel -->
+                <div class="panel recent">
+                    <div class="panel-header">
+                        <h3>Recent Activity</h3>
+                        <span style="font-size: 0.75rem; font-weight: 700; cursor:pointer;">View All</span>
+                    </div>
+                    <div class="activity-list" id="recentActivityList"></div>
+                </div>        
+
+                <!-- System Alerts Panel -->
+                <div class="panel alerts">
+                    <div class="panel-header">
+                        <h3 style="color: var(--primary-dark); font-weight: 900;">System Alerts</h3>
+                        <span style="font-size: 0.75rem; font-weight: 700; cursor:pointer; color: #444;">Clear All</span>
+                    </div>
+                    <div class="alert-list" id="systemAlertList"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+<script src="../js/sidebar.js"></script>
+<script src="..js/logout-modal.js"></script>
+<script src="../js/profile-Dropdownsettings.js"></script>
+
+<script>
+    let dashboardChart;
+
+    const ctx = document
+        .getElementById('mainDashboardChart')
+        .getContext('2d');
+
+    function distribute(total, parts) {
+        let base = Math.floor(total / parts);
+        let remainder = total % parts;
+        let arr = new Array(parts).fill(base);
+
+        for (let i = 0; i < remainder; i++) {
+            arr[i] += 1;
+        }
+
+        return arr;
+    }
+        /* ===============================
+        CHART CONFIGURATION
+        ================================ */
+    function generateChartData(period) {
+        const stats = statsData[period];
+
+        if (period === "today") {
+            return {
+                labels: ['6AM','9AM','12PM','3PM','6PM','9PM'],
+                timeIn: [60, 80, 70, 50, 40, 42],   // total = 342
+                timeOut: [50, 70, 60, 80, 40, 42],  // total = 342
+                unreg: [2,1,1,1,1,1]                // total = 7
+            };
+        }
+
+        if (period === "week") {
+            return {
+                labels: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
+                timeIn: [300,320,310,350,340,300,269],  // = 2189
+                timeOut: [280,300,320,350,330,300,223], // = 2103
+                unreg: [5,4,6,5,4,4,3]                  // = 31
+            };
+        }
+
+        if (period === "month") {
+            return {
+                labels: ['Week 1','Week 2','Week 3','Week 4'],
+                timeIn: [2200,2100,2200,2232],   // = 8732
+                timeOut: [2150,2100,2200,2160],  // = 8610
+                unreg: [30,28,30,26]             // = 114
+        };
+    }
+}
+function initChart(period = 'today') {
+
+    const data = generateChartData(period);
+
+    const config = {
+        type: 'line',
+        data: {
+            labels: data.labels,
+            datasets: [
+                {
+                    label: 'Time In',
+                    data: data.timeIn,
+                    borderColor: '#38a169',
+                    backgroundColor: 'rgba(56, 161, 105, 0.1)',
+                    fill: true,
+                    tension: 0.4,
+                    borderWidth: 3,
+                    pointRadius: 4
+                },
+                {
+                    label: 'Time Out',
+                    data: data.timeOut,
+                    borderColor: '#dd6b20',
+                    backgroundColor: 'rgba(221, 107, 32, 0.1)',
+                    fill: true,
+                    tension: 0.4,
+                    borderWidth: 3,
+                    pointRadius: 4
+                },
+                {
+                    label: 'Unregistered',
+                    data: data.unreg,
+                    borderColor: '#e53e3e',
+                    backgroundColor: 'rgba(229, 62, 62, 0.1)',
+                    fill: true,
+                    tension: 0.4,
+                    borderWidth: 3,
+                    pointRadius: 4,
+                    borderDash: [5, 5]
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { 
+                    position: 'top',
+                    labels: { usePointStyle: true, font: { weight: '700' } }
+                },
+                tooltip: { mode: 'index', intersect: false }
+            },
+            scales: {
+                y: { beginAtZero: true, grid: { display: false } },
+                x: { grid: { display: false } }
+            }
+        }
+    };
+
+    if (dashboardChart) dashboardChart.destroy();
+    dashboardChart = new Chart(ctx, config);
+}
+
+    /* ===============================
+       OVERVIEW DATA & TOGGLE
+    ================================ */
+    const statsData = {
+        today: { timeIn: 342, timeOut: 342, unregistered: 7 },
+        week: { timeIn: 2189, timeOut: 2103, unregistered: 31 },
+        month: { timeIn: 8732, timeOut: 8610, unregistered: 114 }
+    };
+
+    function updateView(period) {
+        // Update stats
+        const data = statsData[period];
+        document.getElementById('val-timein').textContent = data.timeIn;
+        document.getElementById('val-timeout').textContent = data.timeOut;
+        document.getElementById('val-unreg').textContent = data.unregistered;
+
+        // Update active class on buttons
+        const btns = document.querySelectorAll('.toggle-btn');
+        btns.forEach(b => {
+            b.classList.remove('active');
+            if(b.textContent.toLowerCase() === period) b.classList.add('active');
+        });
+
+        // Update Chart
+        initChart(period);
+    }
+
+    /* ===============================
+       EXISTING RECENT ACTIVITY 
+    ================================ */
+    const recentActivities = [
+      { title: "Student Verified", name: "Kim B. Mendeja", time: "11:00 PM, FEB 02, 2026", icon: "fa-check-circle", color: "#38a169" },
+      { title: "Unregistered Student", name: "Hans Miguel M. Manuzon", time: "7:20 AM, FEB 02, 2026", icon: "fa-times-circle", color: "#e53e3e" },
+      { title: "Camera Reconnected", name: "Station 3 - Loss detected", time: "10:20 AM, FEB 02, 2026", icon: "fa-exclamation-triangle", color: "#dd6b20" }
+    ];
+
+    function renderRecentActivities(limit = 3) {
+      const container = document.getElementById("recentActivityList");
+      if(!container) return;
+      container.innerHTML = "";
+      recentActivities.slice(0, limit).forEach(act => {
+        container.innerHTML += `
+          <div class="activity-card">
+            <div class="activity-icon" style="color:${act.color}">
+              <i class="fas ${act.icon}"></i>
+            </div>
+            <div class="activity-details">
+              <p>${act.title}</p>
+              <h4>${act.name}</h4>
+              <div class="activity-time">${act.time}</div>
+            </div>
+          </div>`;
+      });
+    }
+
+    /* ===============================
+       EXISTING SYSTEM ALERTS
+    ================================ */
+    const systemAlerts = [
+        { type: "success", title: "Operating Normally", message: "Systems functioning within optimal parameters.", time: "17:03:00" },
+        { type: "warning", title: "Maintenance Reminder", message: "Database maintenance scheduled for 02/02/2026.", time: "02:00 AM" }
+    ];
+
+    function renderSystemAlerts(limit = 3) {
+        const container = document.getElementById("systemAlertList");
+        if(!container) return;
+        container.innerHTML = "";
+        systemAlerts.slice(0, limit).forEach(alert => {
+            container.innerHTML += `
+            <div class="alert-pill ${alert.type}">
+                <div class="pill-icon"><i class="fas ${alert.type === "success" ? "fa-check" : alert.type === "warning" ? "fa-exclamation" : "fa-info"}"></i></div>
+                <div class="pill-content">
+                    <h4>${alert.title}</h4>
+                    <p>${alert.message}</p>
+                    <span class="pill-meta">${alert.time}</span>
+                </div>
+            </div>`;
+        });
+    }
+
+    // Initialize all on load
+    window.onload = function() {
+        renderRecentActivities();
+        renderSystemAlerts();
+        initChart('today');
+    }
+</script>
+
+</body>
+</html>

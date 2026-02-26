@@ -1,0 +1,136 @@
+        /* --- PROFILE DROPDOWN STYLES --- */
+        .user-section {
+            position: relative;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 5px;
+        }
+
+        .user-section:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        /* Container for the avatar and text to add a chevron */
+        .user-main-display {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            position: relative;
+        }
+
+ .user-main-display::after {
+    content: '\f107';
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.5);
+    transition: transform 0.3s ease;
+    margin-left: auto;
+    opacity: 1; /* SHOW ARROW */
+}
+
+        .user-section.active .user-main-display::after {
+            transform: rotate(180deg);
+        }
+
+        /* The Hidden Menu */
+        .profile-dropdown {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), margin 0.3s ease;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            margin: 0 10px;
+        }
+
+        .user-section.active + .profile-dropdown {
+            max-height: 200px; /* Enough space for items */
+            margin-bottom: 15px;
+            margin-top: 5px;
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 15px;
+            color: #cbd5e0;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .dropdown-item i {
+            width: 20px;
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+
+        .dropdown-item:hover {
+            background: var(--header-green);
+            color: white;
+        }
+
+        .dropdown-item:hover i {
+            opacity: 1;
+        }
+
+/* Yellow Active Indicator for Profile Page */
+.profile-dropdown .dropdown-item.active {
+    background: transparent;
+    color: var(--accent-yellow);
+    font-weight: 700;
+    position: relative;
+}
+
+/* Yellow left line indicator */
+.profile-dropdown .dropdown-item.active::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 8px;
+    bottom: 8px;
+    width: 4px;
+    background: var(--accent-yellow);
+    border-radius: 4px;
+}
+
+/* Icon color */
+.profile-dropdown .dropdown-item.active i {
+    color: var(--accent-yellow);
+}
+
+/* COLLAPSED SIDEBAR PROFILE FIX */
+.sidebar-is-collapsed .user-info {
+    display: none;
+}
+
+.sidebar-is-collapsed .profile-dropdown {
+    position: relative;   /* REMOVE absolute */
+    left: 0;
+    width: 75%;
+}
+
+.sidebar-is-collapsed .dropdown-item {
+    justify-content: center;
+    padding: 12px 0;
+}
+
+.sidebar-is-collapsed .dropdown-item span {
+    display: none; /* HIDE TEXT */
+}
+
+.sidebar-is-collapsed .dropdown-item i {
+    font-size: 1.2rem;
+}
+.sidebar-is-collapsed .user-section {
+    justify-content: center;
+    padding: 15px 0;
+}
+
+.sidebar-is-collapsed .user-main-display::after {
+    display: none; /* Hide arrow when collapsed */
+}

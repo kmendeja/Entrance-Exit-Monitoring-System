@@ -1,0 +1,1527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PLP Facial Monitor - Student Registration</title>
+    <link rel="icon" href="../images/logosmallplp.png">
+
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/sidebar.css">
+    <link rel="stylesheet" href="../css/logout-modal.css">
+    <link rel="stylesheet" href="../css/profile-Dropdownsettings.css">
+
+    <script>
+        (function() {
+            const savedState = localStorage.getItem('plp_sidebar_state');
+            if (window.innerWidth > 768 && savedState === 'collapsed') {
+                document.documentElement.classList.add('sidebar-is-collapsed');
+            }
+        })();
+    </script>
+
+    <style>
+     :root {
+            --primary-dark: #064e3b; 
+            --sidebar-green: #1a4331; 
+            --header-green: #0a7b3d;
+            --white: #ffffff;
+            --accent-yellow: #facc15;
+            --card-green: #9ae6b4;
+            --card-orange: #fbd38d;
+            --card-red: #feb2b2;
+            --sidebar-width-expanded: 260px;
+            --sidebar-width-collapsed: 80px;
+            
+            /* Specific Colors matched from image */
+            --alert-success: #00c853;
+            --alert-success-bg: #99e9c4;
+            --alert-success-text: #064e3b;
+            
+            --alert-warning: #ff6d00;
+            --alert-warning-bg: #ffccbc;
+            --alert-warning-text: #7b341e;
+            
+            --alert-info: #2962ff;
+            --alert-info-bg: #c5cae9;
+            
+            --alert-purple: #2100bc;
+            --alert-purple-bg: #a399e4;
+            --alert-purple-text: #1a0066;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }      :root {
+            --primary-dark: #064e3b; 
+            --sidebar-green: #1a4331; 
+            --header-green: #0a7b3d;
+            --white: #ffffff;
+            --accent-yellow: #facc15;
+            --sidebar-width-expanded: 260px;
+        }
+        /* --- Stats Row --- */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 25px;
+            padding: 15px 25px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 12px 25px rgba(0,0,0,0.18);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 10px;
+        }
+
+        .stat-card.blue::before { background-color: #0047ab; }
+        .stat-card.gold::before { background-color: #b8860b; }
+        .stat-card.green::before { background-color: #008000; }
+
+        .stat-icon { font-size: 3rem; opacity: 1; }
+        .stat-card.blue .stat-icon { color: #0047ab; }
+        .stat-card.gold .stat-icon { color: #b8860b; }
+        .stat-card.green .stat-icon { color: #00c853; }
+
+        .stat-info p { font-size: 0.85rem; font-weight: 600; color: #333; }
+        .stat-info h2 { font-size: 3.5rem; font-weight: 800; line-height: 1; }
+        .stat-card.blue h2 { color: #1a237e; }
+        .stat-card.gold h2 { color: #7b5e00; }
+        .stat-card.green h2 { color: #1b5e20; }
+
+        /* --- Registration Grid --- */
+        .registration-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 20px;
+        }
+
+        /* Registration Responsive */
+        @media (max-width: 1200px) {
+            .registration-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .registration-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-card,
+            .capture-card {
+                padding: 25px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .registration-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .button-row {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+
+            .form-card,
+            .capture-card {
+                padding: 20px;
+                border-radius: 25px;
+            }
+
+            .card-header h2 {
+                font-size: 1.4rem;
+            }
+
+            .card-header p {
+                font-size: 0.7rem;
+            }
+
+            .stat-info h2 {
+                font-size: 2rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            main.content {
+                padding: 15px;
+            }
+
+            .form-card,
+            .capture-card {
+                padding: 18px;
+            }
+
+            .form-input,
+            .form-select {
+                font-size: 0.9rem;
+                padding: 10px 15px;
+            }
+
+            .btn {
+                font-size: 0.85rem;
+                padding: 10px;
+            }
+
+            .camera-view {
+                aspect-ratio: 4/3;
+                padding: 15px;
+            }
+
+            .guidelines {
+                flex-direction: column;
+                text-align: center;
+                gap: 10px;
+            }
+
+            .guidelines i {
+                font-size: 2rem;
+            }
+        }
+
+        .form-card {
+            background: linear-gradient(145deg, #f5f7fa, #e0e7ff); 
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+            border-radius: 30px;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between; 
+            height: 100%;
+        }
+
+        .card-header { text-align: center; margin-bottom: 25px; }
+        .card-header h2 { color: #1a4331; font-size: 1.8rem; margin-bottom: 5px; }
+        .card-header p { color: #333; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; }
+
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-weight: 700; color: #1a4331; margin-bottom: 5px; }
+        
+        .form-input, .form-select {
+            width: 100%;
+            padding: 12px 20px;
+            border: 2px solid #ddd;
+            border-radius: 30px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background-color: #fff;
+            color: #333;
+            outline: none;
+        }
+
+        .form-input:focus, .form-select:focus {
+            border-color: #0a7b3d;     
+            box-shadow: 0 0 10px rgba(10,123,61,0.4); 
+            background-color: #f0fff4;   
+        }
+
+        .form-input.error, .form-select.error {
+            border-color: #ef5350;
+            background-color: #ffebee;
+        }
+
+        .form-row { display: grid; grid-template-columns: 1fr 1.5fr; gap: 15px; }
+        
+        .form-select {
+            appearance: none;
+            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%231a4331' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") no-repeat right 15px center;
+            background-size: 18px;
+            background-color: #fff;
+        }
+
+        .button-row { display: flex; gap: 10px; margin-top: 30px; }
+        .btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 25px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            cursor: pointer;
+            color: white;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+        .btn:active { opacity: 0.8; }
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .btn-clear { background-color: #ef5350; }
+        .btn-clear:hover { background-color: #e53935; }
+        .btn-preview { background-color: #2e7d32; }
+        .btn-preview:hover { background-color: #27632a; }
+        .btn-save { background-color: #ffca28; color: #000; }
+        .btn-save:hover { background-color: #ffc107; }
+
+        /* --- Facial Capture Side --- */
+        .capture-card {
+            background: white;
+            border-radius: 30px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        .camera-view {
+            background-color: #1a4331;
+            border-radius: 20px;
+            aspect-ratio: 16 / 10;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .camera-view video {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
+        }
+
+        #cameraPlaceholder {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-align: center;
+        }
+
+        .camera-view i { font-size: 3rem; color: #ffca28; margin-bottom: 10px; }
+        .camera-view h4 { font-size: 0.8rem; text-transform: uppercase; margin-top: 10px; }
+        .camera-view p { font-size: 0.7rem; opacity: 0.8; }
+
+        .btn-init {
+            background-color: #ffca28;
+            color: #000;
+            width: 80%;
+            margin: 0 auto;
+        }
+
+        .captured-section {
+            border: 2px dashed #999;
+            border-radius: 20px;
+            padding: 15px;
+            text-align: center;
+            background-color: #f5f5f5;
+            min-height: 150px;
+        }
+        .captured-section p { font-size: 0.85rem; font-weight: 700; color: #333; margin-bottom: 10px; }
+        .no-capture {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            color: #666;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+        .no-capture i { font-size: 1.5rem; }
+        .no-capture span { font-size: 0.6rem; text-transform: uppercase; }
+
+        .guidelines {
+            background-color: #7986cb;
+            border-radius: 20px;
+            padding: 12px 20px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            color: #1a237e;
+        }
+        .guidelines i { font-size: 2.5rem; }
+        .guidelines-text h4 { font-size: 0.95rem; margin-bottom: 2px; }
+        .guidelines-text ul { font-size: 0.7rem; list-style: disc; margin-left: 15px; font-weight: 500; }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            background: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 10000;
+            animation: slideIn 0.3s ease;
+            max-width: 350px;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .toast.success {
+            border-left: 4px solid #00c853;
+        }
+
+        .toast.error {
+            border-left: 4px solid #ef5350;
+        }
+
+        .toast.warning {
+            border-left: 4px solid #ff9800;
+        }
+
+        .toast i {
+            font-size: 1.5rem;
+        }
+
+        .toast.success i {
+            color: #00c853;
+        }
+
+        .toast.error i {
+            color: #ef5350;
+        }
+
+        .toast.warning i {
+            color: #ff9800;
+        }
+
+        .toast-content h4 {
+            font-size: 0.9rem;
+            margin-bottom: 3px;
+            color: #333;
+        }
+
+        .toast-content p {
+            font-size: 0.75rem;
+            color: #666;
+        }
+
+        @media (max-width: 1024px) {
+            .stats-row { grid-template-columns: 1fr; }
+            .registration-grid { grid-template-columns: 1fr; }
+            .stat-info h2 { font-size: 2.5rem; }
+        }
+
+        /* Modal Overlay */
+        .preview-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: none; /* Hidden by default */
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            backdrop-filter: blur(4px);
+        }
+
+        /* Modal Container */
+        .preview-modal {
+             background: white;
+            width: 90%;
+            max-width: 550px;
+            border-radius: 30px;
+            border: 5px solid #258032;
+            position: relative;
+            padding: 40px 30px 30px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+             animation: modalSlideUp 0.4s ease;
+        }
+
+        @keyframes modalSlideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* Floating Logo */
+        .modal-logo {
+                     position: absolute;
+            top: -45px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 100px;
+            background: white;
+            border-radius: 50%;
+            padding: 5px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .modal-logo img { width: 100%; height: 100%; object-fit: contain; }
+
+        /* Back Button */
+       .back-btn {
+            position: absolute;
+            top: 25px;
+            left: 25px;
+            background: none;
+            border: none;
+            color: #1a4331;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.9rem;
+        }
+
+        .modal-title {
+            margin-top: 30px;
+            font-size: 1.8rem;
+            color: #258032;
+            font-weight: bold;
+            margin-bottom: 25px;
+        }
+
+        /* Info Grid */
+        .info-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .info-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .full-width {
+            grid-column: span 2;
+        }
+
+        .info-group label {
+            display: block;
+            color: var(--plp-green);
+            font-weight: bold;
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+
+        .info-value {
+            background: var(--input-bg);
+            padding: 10px 15px;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            color: #444;
+            border: none;
+            width: 100%;
+        }
+
+        /* Helper Classes */
+        .show {
+            display: flex;
+        }
+
+        
+    </style>
+    
+</head>
+<body>
+     <header>
+        <div class="header-left">
+            <button id="menu-toggle" title="Toggle Menu">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="logo-container">
+                <img src="../images/logosmallplp.png" alt="PLP Logo">
+                <div class="brand-text">
+                    <h1>PLP Facial Monitor</h1>
+                    <p>PAMANTASAN NG LUNGSOD NG PASIG</p>
+                </div>
+            </div>
+        </div>
+        <div class="header-right">
+            <span id="live-date">load...</span>
+            <span id="live-time">00:00:00 AM</span>
+        </div>
+    </header>
+
+        <div class="main-container">
+        <div class="sidebar-overlay" id="sidebar-overlay"></div>
+        
+    <nav class="sidebar" id="sidebar">
+        <!-- Wrap user section for click event -->
+        <div class="user-section" id="profileToggle">
+            <div class="user-main-display">
+                <div class="avatar-circle">HN</div>
+                <div class="user-info">
+                    <h4>Harlene Nebasa</h4>
+                    <p>nebasa_harlene@plpasig.edu.ph</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- The Dropdown Menu Items -->
+        <div class="profile-dropdown" id="profileMenu">
+            <a href="../server/profile-settings.html" class="dropdown-item">
+                <i class="fas fa-user-cog"></i>
+                <span>Profile Settings</span>
+            </a>
+            <a href="../server/change-password.html" class="dropdown-item">
+                <i class="fas fa-key"></i>
+                <span>Create New Password</span>
+            </a>
+            <a href="../server/security-logs.html" class="dropdown-item">
+                <i class="fas fa-shield-alt"></i>
+                <span>Security Passwords Changed</span>
+            </a>
+        </div>
+
+    <div class="nav-menu">
+                <a href="../server/dashboardpage.html" class="nav-item">
+                    <i class="fas fa-th-large"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="../server/studentregistrationpage.html" class="nav-item active">
+                    <i class="fas fa-user-circle"></i>
+                    <span>Registration</span>
+                </a>
+                <a href="../server/studentrecords.html" class="nav-item">
+                    <i class="fas fa-folder"></i>
+                    <span>Student Records</span>
+                </a>
+                <a href="../server/archivepage.html" class="nav-item">
+                    <i class="fas fa-archive"></i>
+                    <span>Archive</span>
+                </a>
+                <a href="../server/loginpage.html" class="nav-item logout" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </nav>
+
+        <!-- Logout Confirmation Modal -->
+        <div class="logout-modal" id="logoutModal">
+            <div class="logout-box">
+                <h3>Confirm Logout</h3>
+                <p>Are you sure you want to logout?</p>
+                <div class="logout-actions">
+                    <button class="cancel-btn" id="cancelLogout">Cancel</button>
+                    <button class="confirm-btn" id="confirmLogout">Yes, Logout</button>
+                </div>
+            </div>
+        </div>
+
+        <main class="content">
+            <div class="content-header">
+                <div class="title-group">
+                    <h2>System Dashboard</h2>
+                    <p>COMPREHENSIVE MONITORING AND MANAGEMENT OVERVIEW</p>
+                </div>
+                <a href="../server/dashboardpage.html" class="home-btn">
+                    <i class="fas fa-home"></i> Home
+                </a>
+            </div>
+
+            <!-- Stats Row -->
+            <div class="stats-row">
+                <div class="stat-card blue">
+                    <i class="fas fa-graduation-cap stat-icon"></i>
+                    <div class="stat-info">
+                        <p>Total Students Registered</p>
+                        <h2 id="totalStudents">0</h2>
+                    </div>
+                </div>
+                <div class="stat-card gold">
+                    <i class="fas fa-graduation-cap stat-icon"></i>
+                    <div class="stat-info">
+                        <p>This Month's Registry</p>
+                        <h2 id="monthlyStudents">0</h2>
+                    </div>
+                </div>
+                <div class="stat-card green">
+                    <i class="fas fa-graduation-cap stat-icon"></i>
+                    <div class="stat-info">
+                        <p>Today's Student Registry</p>
+                        <h2 id="todaysStudents">0</h2>
+                    </div>
+                </div>
+            </div>
+
+            <div class="registration-grid">
+                <!-- Left: Student Info Form -->
+                <div class="form-card">
+                    <div class="card-header">
+                        <h2>Student Information</h2>
+                        <p>Please enter your details here</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Full Name <span style="color: red;">*</span></label>
+                        <input type="text" id="fullName" class="form-input" placeholder="Enter Your Full Name (Surname, First Name, Middle Name)">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Student ID <span style="color: red;">*</span></label>
+                        <input type="text" id="studentid" class="form-input" placeholder="Enter Your Student ID (e.g., 23-12345)">
+                    </div>                   
+                    
+                    <div class="form-group">
+                        <label>Student Status <span style="color: red;">*</span></label>
+                          <select id="studentStatus" class="form-select">
+                                <option value="">Select Student Status</option>
+                                <option>Regular Student</option>
+                                <option>Irregular Student</option>
+                                <option>Transfer Student</option>
+                                <option>Alumni</option>
+                            </select>
+                        </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Year Level <span style="color: red;">*</span></label>
+                            <select id="yearLevel" class="form-select">
+                                <option value="">Select Year Level</option>
+                                <option>1st Year</option>
+                                <option>2nd Year</option>
+                                <option>3rd Year</option>
+                                <option>4th Year</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Course <span style="color: red;">*</span></label>
+                            <select id="course" class="form-select">
+                                <option value="">Select Course</option>
+                                <option>BS in Information Technology</option>
+                                <option>BS in Computer Science</option>
+                                <option>BS in Business Administration</option>
+                                <option>BS in Hospitality Management</option>
+                                <option>BS in Nursing</option>
+                                <option>BS in Psychology</option>
+                                <option>BS in Engineering</option>
+                                <option>BS in Education</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Contact Number <span style="color: red;">*</span></label>
+                            <input type="text" id="contactNumber" class="form-input" placeholder="09XX-XXX-XXXX">
+                        </div>
+                        <div class="form-group">
+                            <label>Email Address <span style="color: red;">*</span></label>
+                            <input type="email" id="emailAddress" class="form-input" placeholder="student@plpasig.edu.ph">
+                        </div>
+                    </div>
+
+                    <div class="button-row">
+                        <button type="button" id="clearForm" class="btn btn-clear"><i class="fas fa-eraser"></i> Clear Form</button>
+                        <button type="button" id="previewBtn" class="btn btn-preview"><i class="fas fa-eye"></i> Preview</button>
+                        <button type="button" id="saveStudent" class="btn btn-save"><i class="fas fa-save"></i> Save Student</button>
+                    </div>
+                </div>
+
+                <!-- Right: Facial Capture -->
+                <div class="capture-card">
+                    <div class="card-header">
+                        <h2>Facial Capture</h2>
+                        <p>Please place your face within the camera frame</p>
+                    </div>
+
+                    <div class="camera-view">
+                        <video id="video" autoplay playsinline></video>
+                        <canvas id="canvas" style="display:none;"></canvas>
+
+                        <div id="cameraPlaceholder">
+                            <i class="fas fa-camera"></i>
+                            <h4>Camera Not Initialized</h4>
+                            <p>CLICK "TURN ON CAMERA" TO START</p>
+                        </div>
+                    </div>
+
+                    <button id="toggleCamera" class="btn btn-init">
+                        <i class="fas fa-video"></i> Turn On Camera
+                    </button>
+
+                    <button id="captureBtn" class="btn btn-preview" style="display:none;">
+                        <i class="fas fa-camera"></i> Capture Image
+                    </button>
+
+                    <div class="captured-section">
+                        <p id="captureCount">Captured Images (0/5)</p>
+                        <div id="imagePreviewContainer" style="display:flex; gap:10px; flex-wrap:wrap; justify-content: center;"></div>
+                        <div class="no-capture" id="noCapture">
+                            <i class="fas fa-images"></i>
+                            No Image Captured
+                            <span>Capture 3-5 face images from different angles</span>
+                        </div>
+                    </div>
+
+                    <div class="guidelines">
+                        <i class="fas fa-info-circle"></i>
+                        <div class="guidelines-text">
+                            <h4>Capture Guidelines</h4>
+                            <ul>
+                                <li>Ensure good lighting and clear face visibility</li>
+                                <li>Capture 3-5 images from different angles</li>
+                                <li>Remove glasses and face coverings if possible</li>
+                                <li>Maintain neutral expression for best results</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <!-- The Modal Structure -->
+                    <div id="previewModalOverlay" class="preview-overlay">
+                        <div class="preview-modal">
+                            <!-- Floating Logo -->
+                            <div class="modal-logo">
+                                <!-- Replace with your actual logo path -->
+                                <img src="../images/logo.png" alt="PLP Logo">
+                            </div>
+
+                            <button class="back-btn" id="closeModal">
+                                <i class="fas fa-reply"></i> Back
+                            </button>
+
+
+                            <h2 class="modal-title">Student Registration Preview</h2>
+
+                            <div class="info-container">
+                                <!-- Full Name (Full Width) -->
+                                <div class="info-group full-width">
+                                    <label>Full Name</label>
+                                    <div class="info-value" id="view-fullName" >---</div>
+                                </div>
+
+                                <div class="info-group full-width">
+                                    <label>Student Status</label>
+                                    <div class="info-value" id="view-studentStatus" >---</div>
+                                </div>
+
+
+                                <!-- ID and Contact -->
+                                <div class="info-row">
+                                    <div class="info-group">
+                                        <label>Student ID</label>
+                                        <div class="info-value" id="view-studentId">---</div>
+                                    </div>
+                                    <div class="info-group">
+                                        <label>Contact Number</label>
+                                        <div class="info-value" id="view-contact">---</div>
+                                    </div>
+                                </div>
+
+                                <!-- Year and Course -->
+                                <div class="info-row">
+                                    <div class="info-group">
+                                        <label>Year Level</label>
+                                        <div class="info-value" id="view-yearLevel">---</div>
+                                    </div>
+                                    <div class="info-group">
+                                        <label>Course</label>
+                                        <div class="info-value" id="view-course">---</div>
+                                    </div>
+                                </div>
+
+                                <!-- Email and Image Count -->
+                                <div class="info-row">
+                                    <div class="info-group">
+                                        <label>Email</label>
+                                        <div class="info-value" id="view-email">---</div>
+                                    </div>
+                                    <div class="info-group">
+                                        <label>Image Capture</label>
+                                        <div class="info-value" id="view-images">0/5</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+<script src="../js/sidebar.js"></script>
+<script src="../js/logout-modal.js"></script>
+<script src="../js/profile-Dropdownsettings.js"></script>
+
+<script>
+
+/* ===============================
+   TOAST NOTIFICATION SYSTEM
+================================ */
+
+function showToast(type, title, message) {
+    const existingToast = document.querySelector('.toast');
+    if (existingToast) {
+        existingToast.remove();
+    }
+
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    
+    let icon = 'fa-check-circle';
+    if (type === 'error') icon = 'fa-exclamation-circle';
+    if (type === 'warning') icon = 'fa-exclamation-triangle';
+    
+    toast.innerHTML = `
+        <i class="fas ${icon}"></i>
+        <div class="toast-content">
+            <h4>${title}</h4>
+            <p>${message}</p>
+        </div>
+    `;
+    
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.style.animation = 'slideIn 0.3s ease reverse';
+        setTimeout(() => toast.remove(), 300);
+    }, 4000);
+}
+
+/* ===============================
+   STUDENT STORAGE 
+================================ */
+let students = [];
+
+    // Load students from localStorage on page load
+    function loadStudents() {
+        try {
+            const storedData = localStorage.getItem("students");
+            if (storedData) {
+                students = JSON.parse(storedData);
+                console.log('📊 Loaded students from localStorage:', students.length);
+            } else {
+                students = [];
+                console.log('📊 No existing student data found');
+            }
+        } catch (error) {
+            console.error('❌ Error loading students:', error);
+            students = [];
+        }
+    }
+
+    // Save students to localStorage
+    function saveStudents() {
+        try {
+            localStorage.setItem("students", JSON.stringify(students));
+            console.log('✅ Students saved to localStorage:', students.length);
+            return true;
+        } catch (error) {
+            console.error('❌ Error saving students:', error);
+            showToast('error', 'Save Error', 'Failed to save to local storage');
+            return false;
+        }
+    }
+
+    // Initialize on page load
+    loadStudents();
+
+    /* ===============================
+    DOM ELEMENTS
+    ================================ */
+    const fullName = document.getElementById("fullName");
+    const studentId = document.getElementById("studentid");
+    const studentStatus = document.getElementById("studentStatus");
+    const yearLevel = document.getElementById("yearLevel");
+    const course = document.getElementById("course");
+    const contactNumber = document.getElementById("contactNumber");
+    const emailAddress = document.getElementById("emailAddress");
+
+    const totalStudentsEl = document.getElementById("totalStudents");
+    const monthlyStudentsEl = document.getElementById("monthlyStudents");
+    const todaysStudentsEl = document.getElementById("todaysStudents");
+
+    const saveBtn = document.getElementById("saveStudent");
+    const clearBtn = document.getElementById("clearForm");
+    const previewBtn = document.getElementById("previewBtn");
+
+    const modalOverlay = document.getElementById("previewModalOverlay");
+    const closeModal = document.getElementById("closeModal");
+
+
+    /* ===============================
+    CAMERA VARIABLES
+    ================================ */
+    const video = document.getElementById("video");
+    const canvas = document.getElementById("canvas");
+    const toggleBtn = document.getElementById("toggleCamera");
+    const captureBtn = document.getElementById("captureBtn");
+    const captureCountText = document.getElementById("captureCount");
+    const imageContainer = document.getElementById("imagePreviewContainer");
+    const placeholder = document.getElementById("cameraPlaceholder");
+    const noCapture = document.getElementById("noCapture");
+
+    let stream = null;
+    let capturedImages = [];
+
+    /* ===============================
+    UPDATE STATS 
+    ================================ */
+    function updateStats() {
+        // Total students
+        const total = students.length;
+        totalStudentsEl.textContent = total;
+        
+        // Get current date info
+        const now = new Date();
+        const today = now.toISOString().split("T")[0]; // YYYY-MM-DD
+        const currentMonth = now.toISOString().slice(0, 7); // YYYY-MM
+        
+        // Count today's registrations
+        let todayCount = 0;
+        let monthCount = 0;
+        
+        students.forEach(student => {
+            if (student.date) {
+                const studentDate = student.date.split("T")[0]; // Get date part only
+                const studentMonth = student.date.slice(0, 7);
+                
+                if (studentDate === today) {
+                    todayCount++;
+                }
+                
+                if (studentMonth === currentMonth) {
+                    monthCount++;
+                }
+            }
+        });
+        
+        todaysStudentsEl.textContent = todayCount;
+        monthlyStudentsEl.textContent = monthCount;
+        
+        console.log(`📊 Stats Updated: Total=${total}, Month=${monthCount}, Today=${todayCount}`);
+    }
+
+    // Initial stats update
+    updateStats();
+
+    /* ===============================
+    FORM VALIDATION
+    ================================ */
+    function validateForm() {
+        let isValid = true;
+        const fields = [fullName, studentId, yearLevel, course, contactNumber, emailAddress];
+        
+        // Remove all previous error states
+        fields.forEach(field => field.classList.remove('error'));
+
+        // Validate Full Name
+        if (!fullName.value.trim()) {
+            fullName.classList.add('error');
+            showToast('error', 'Validation Error', 'Full Name is required');
+            isValid = false;
+            return false;
+        }
+
+        // Validate Student ID format (XX-XXXXX)
+        const studentIdRegex = /^\d{2}-\d{5}$/;
+        if (!studentIdRegex.test(studentId.value.trim())) {
+            studentId.classList.add('error');
+            showToast('error', 'Invalid Student ID', 'Student ID must be in format: 23-12345');
+            isValid = false;
+            return false;
+        }
+
+        // Check for duplicate Student ID
+        const isDuplicate = students.some(s => s.id === studentId.value.trim());
+        if (isDuplicate) {
+            studentId.classList.add('error');
+            showToast('error', 'Duplicate Student ID', 'This Student ID is already registered');
+            isValid = false;
+            return false;
+        }
+
+        // Validate Year Level
+        if (!yearLevel.value) {
+            yearLevel.classList.add('error');
+            showToast('error', 'Validation Error', 'Please select a Year Level');
+            isValid = false;
+            return false;
+        }
+
+        // Validate Course
+        if (!course.value) {
+            course.classList.add('error');
+            showToast('error', 'Validation Error', 'Please select a Course');
+            isValid = false;
+            return false;
+        }
+
+            // Validate Student Status
+        if (!studentStatus.value) {
+            studentStatus.classList.add('error');
+            showToast('error', 'Validation Error', 'Please select a Student Status');
+            isValid = false;
+            return false;
+        }
+
+
+        // Validate Contact Number (Philippine format)
+        const contactRegex = /^(09|\+639)\d{9}$/;
+        const cleanContact = contactNumber.value.replace(/[-\s]/g, '');
+        if (!contactRegex.test(cleanContact)) {
+            contactNumber.classList.add('error');
+            showToast('error', 'Invalid Contact', 'Contact number must be valid Philippine number (09XXXXXXXXX)');
+            isValid = false;
+            return false;
+        }
+
+        // Validate Email (must be @plpasig.edu.ph)
+        if (!emailAddress.value.endsWith('@plpasig.edu.ph')) {
+            emailAddress.classList.add('error');
+            showToast('error', 'Invalid Email', 'Email must be a valid @plpasig.edu.ph address');
+            isValid = false;
+            return false;
+        }
+
+        // Validate captured images
+        if (capturedImages.length < 3) {
+            showToast('error', 'Insufficient Images', 'Please capture at least 3 facial images');
+            isValid = false;
+            return false;
+        }
+
+        return isValid;
+    }
+
+    /* ===============================
+    PHOTO QUALITY CHECK
+    ================================ */
+    function checkPhotoQuality(imageData) {
+        return new Promise(resolve => {
+            const img = new Image();
+            img.src = imageData;
+            img.onload = function () {
+                const tempCanvas = document.createElement("canvas");
+                const ctx = tempCanvas.getContext("2d");
+                tempCanvas.width = img.width;
+                tempCanvas.height = img.height;
+                ctx.drawImage(img, 0, 0);
+
+                const data = ctx.getImageData(0, 0, tempCanvas.width, tempCanvas.height).data;
+
+                let brightness = 0;
+                let sharpness = 0;
+
+                for (let i = 0; i < data.length; i += 4) {
+                    const r = data[i], g = data[i + 1], b = data[i + 2];
+                    const avg = (r + g + b) / 3;
+                    brightness += avg;
+
+                    if (i < data.length - 8) {
+                        sharpness += Math.abs(data[i] - data[i + 4]);
+                    }
+                }
+
+                brightness /= (data.length / 4);
+                sharpness /= (data.length / 4);
+
+                if (brightness < 60) resolve("Low");
+                else if (sharpness < 15) resolve("Medium");
+                else resolve("High");
+            };
+        });
+    }
+
+    /* ===============================
+    INITIALIZE CAMERA
+    ================================ */
+    toggleBtn.addEventListener("click", async () => {
+        if (!stream) {
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({
+                    video: { 
+                        facingMode: "user",
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 }
+                    }
+                });
+
+                video.srcObject = stream;
+                video.style.display = "block";
+                placeholder.style.display = "none";
+
+                toggleBtn.innerHTML = '<i class="fas fa-video-slash"></i> Turn Off Camera';
+                toggleBtn.style.backgroundColor = "#ef5350";
+
+                captureBtn.style.display = "block";
+                
+                showToast('success', 'Camera Activated', 'Camera is now ready for capture');
+
+            } catch (error) {
+                showToast('error', 'Camera Error', 'Unable to access camera. Please check permissions.');
+                console.error(error);
+            }
+        } else {
+            stream.getTracks().forEach(track => track.stop());
+            stream = null;
+
+            video.srcObject = null;
+            video.style.display = "none";
+            placeholder.style.display = "flex";
+
+            toggleBtn.innerHTML = '<i class="fas fa-video"></i> Turn On Camera';
+            toggleBtn.style.backgroundColor = "#ffca28";
+
+            captureBtn.style.display = "none";
+            
+            showToast('warning', 'Camera Deactivated', 'Camera has been turned off');
+        }
+    });
+
+    /* ===============================
+    CAPTURE IMAGE
+    ================================ */
+    captureBtn.addEventListener("click", async () => {
+        if (!stream) {
+            showToast('error', 'Camera Not Active', 'Please turn on the camera first');
+            return;
+        }
+
+        if (capturedImages.length >= 5) {
+            showToast('warning', 'Maximum Reached', 'You can only capture up to 5 images');
+            return;
+        }
+
+    // Keep original size for preview
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+
+    const ctx = canvas.getContext("2d");
+    ctx.drawImage(video, 0, 0);
+
+    // Create temporary smaller canvas for storage only
+    const tempCanvas = document.createElement("canvas");
+    tempCanvas.width = 400;
+    tempCanvas.height = 300;
+
+    const tempCtx = tempCanvas.getContext("2d");
+    tempCtx.drawImage(canvas, 0, 0, 400, 300);
+
+    // Compress image
+    const imageData = tempCanvas.toDataURL("image/jpeg", 0.4);
+
+    // OPTIONAL: check quality
+    let quality = "Unknown";
+    if (typeof checkPhotoQuality === "function") {
+        quality = await checkPhotoQuality(imageData);
+    }
+
+    // Save BOTH image + quality
+    capturedImages.push({
+        data: imageData,
+        quality: quality
+    });
+
+    renderImages();
+
+        
+        showToast('success', 'Image Captured', `Image ${capturedImages.length} captured successfully (${quality} quality)`);
+    });
+
+    /* ===============================
+    RENDER IMAGES
+    ================================ */
+    function renderImages() {
+        imageContainer.innerHTML = "";
+        
+        if (capturedImages.length > 0) {
+            noCapture.style.display = 'none';
+        } else {
+            noCapture.style.display = 'flex';
+        }
+
+        capturedImages.forEach((imgObj, index) => {
+            const wrapper = document.createElement("div");
+            wrapper.style.position = "relative";
+            wrapper.style.display = "inline-block";
+
+            const img = document.createElement("img");
+            img.src = imgObj.data;
+            img.style.width = "70px";
+            img.style.height = "70px";
+            img.style.objectFit = "cover";
+            img.style.borderRadius = "10px";
+            img.style.border = "2px solid #ddd";
+
+            const badge = document.createElement("span");
+            badge.textContent = imgObj.quality;
+            badge.style.position = "absolute";
+            badge.style.bottom = "0";
+            badge.style.left = "0";
+            badge.style.right = "0";
+            badge.style.fontSize = "9px";
+            badge.style.color = "#fff";
+            badge.style.padding = "2px";
+            badge.style.textAlign = "center";
+            badge.style.borderBottomLeftRadius = "10px";
+            badge.style.borderBottomRightRadius = "10px";
+            badge.style.fontWeight = "bold";
+
+            if (imgObj.quality === "High") badge.style.background = "green";
+            else if (imgObj.quality === "Medium") badge.style.background = "orange";
+            else badge.style.background = "red";
+
+            const deleteBtn = document.createElement("button");
+            deleteBtn.innerHTML = '<i class="fas fa-times"></i>';
+            deleteBtn.style.position = "absolute";
+            deleteBtn.style.top = "-8px";
+            deleteBtn.style.right = "-8px";
+            deleteBtn.style.background = "red";
+            deleteBtn.style.color = "#fff";
+            deleteBtn.style.border = "none";
+            deleteBtn.style.borderRadius = "50%";
+            deleteBtn.style.width = "22px";
+            deleteBtn.style.height = "22px";
+            deleteBtn.style.cursor = "pointer";
+            deleteBtn.style.fontSize = "11px";
+            deleteBtn.style.display = "flex";
+            deleteBtn.style.alignItems = "center";
+            deleteBtn.style.justifyContent = "center";
+
+            deleteBtn.addEventListener("click", () => {
+                capturedImages.splice(index, 1);
+                renderImages();
+                showToast('warning', 'Image Deleted', 'Captured image has been removed');
+            });
+
+            wrapper.appendChild(img);
+            wrapper.appendChild(badge);
+            wrapper.appendChild(deleteBtn);
+            imageContainer.appendChild(wrapper);
+        });
+
+        captureCountText.textContent = `Captured Images (${capturedImages.length}/5)`;
+        captureBtn.disabled = capturedImages.length >= 5;
+    }
+
+    /* ===============================
+    SAVE STUDENT
+    ================================ */
+    saveBtn.addEventListener("click", function () {
+        console.log('💾 Save button clicked');
+        
+        // Validate form first
+        if (!validateForm()) {
+            console.log('❌ Validation failed');
+            return;
+        }
+
+        console.log('✅ Validation passed');
+
+        // Disable button to prevent double submission
+        saveBtn.disabled = true;
+        saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+
+        // Simulate save delay for better UX
+        setTimeout(() => {
+            try {
+                const student = {
+                    name: fullName.value.trim(),
+                    id: studentId.value.trim(),
+                    year: yearLevel.value,
+                    status: studentStatus.value,
+                    course: course.value,
+                    contact: contactNumber.value.trim(),
+                    email: emailAddress.value.trim(),
+                    photos: capturedImages,
+                    date: new Date().toISOString(),
+                    registeredBy: "Harlene Nebasa"
+                };
+
+                console.log('📝 Creating student object:', student);
+
+                // Add to array
+                students.push(student);
+                console.log('📊 Students array length:', students.length);
+
+                // Save to localStorage
+                const saveSuccess = saveStudents();
+                
+                if (saveSuccess) {
+                    // Update statistics
+                    updateStats();
+
+                    showToast('success', 'Registration Complete', `${student.name} has been successfully registered!`);
+
+                    console.log('✅ Student saved successfully');
+
+                    // Reset form after 1 second
+                    setTimeout(() => {
+                        resetAll();
+                        saveBtn.disabled = false;
+                        saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Student';
+                    }, 1000);
+                } else {
+                    throw new Error('Failed to save to localStorage');
+                }
+
+            } catch (error) {
+                console.error('❌ Save error:', error);
+                showToast('error', 'Save Failed', 'An error occurred while saving student data');
+                
+                // Re-enable button
+                saveBtn.disabled = false;
+                saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Student';
+            }
+        }, 800);
+    });
+
+    /* ===============================
+    CLEAR FORM
+    ================================ */
+    clearBtn.addEventListener("click", () => {
+        if(confirm("Are you sure you want to clear all fields and captured images?")) {
+            resetAll();
+            showToast('warning', 'Form Cleared', 'All fields have been reset');
+        }
+    });
+
+    /* ===============================
+    PREVIEW
+    ================================ */
+            previewBtn.addEventListener("click", () => {
+                // Update modal text before showing
+                document.getElementById('view-fullName').innerText = fullName.value || 'Not provided';
+                document.getElementById('view-studentId').innerText = studentId.value || 'Not provided';
+                document.getElementById('view-yearLevel').innerText = yearLevel.value || 'Not selected';
+                document.getElementById('view-studentStatus').innerText = studentStatus.value || 'Not selected';
+                document.getElementById('view-course').innerText = course.value || 'Not selected';
+                document.getElementById('view-contact').innerText = contactNumber.value || 'Not provided';
+                document.getElementById('view-email').innerText = emailAddress.value || 'Not provided';
+                document.getElementById('view-images').innerText = `${capturedImages.length}/5`;
+
+                // Show modal
+                modalOverlay.classList.add('show');
+            });
+
+            // Close logic
+            closeModal.addEventListener("click", () => {
+                modalOverlay.classList.remove('show');
+            });
+
+            // Close on clicking outside the modal box
+            window.addEventListener("click", (e) => {
+                if (e.target === modalOverlay) {
+                    modalOverlay.classList.remove('show');
+                }
+            });
+
+    /* ===============================
+    RESET EVERYTHING
+    ================================ */
+    function resetAll() {
+        // Clear form fields
+        fullName.value = "";
+        studentId.value = "";
+        yearLevel.value = "";
+        studentStatus.value = "";
+        course.value = "";
+        contactNumber.value = "";
+        emailAddress.value = "";
+        
+        // Remove error states
+        [fullName, studentId, yearLevel, studentStatus, course, contactNumber, emailAddress].forEach(field => {
+            field.classList.remove('error');
+        });
+        
+        // Clear captured images
+        capturedImages = [];
+        renderImages();
+        
+        // Reset camera
+        if(stream) {
+            stream.getTracks().forEach(track => track.stop());
+            stream = null;
+        }
+        
+        video.srcObject = null;
+        video.style.display = "none";
+        placeholder.style.display = "flex";
+        
+        toggleBtn.innerHTML = '<i class="fas fa-video"></i> Turn On Camera';
+        toggleBtn.style.backgroundColor = "#ffca28";
+        
+        captureBtn.style.display = "none";
+    }
+
+    /* ===============================
+    INPUT FORMATTERS
+    ================================ */
+    // Format Student ID as user types
+    studentId.addEventListener('input', function(e) {
+        let value = e.target.value.replace(/[^\d-]/g, '');
+        if (value.length > 8) {
+            value = value.substring(0, 8);
+        }
+        if (value.length > 2 && value.charAt(2) !== '-') {
+            value = value.substring(0, 2) + '-' + value.substring(2);
+        }
+        e.target.value = value;
+    });
+
+    // Format contact number
+    contactNumber.addEventListener('input', function(e) {
+        let value = e.target.value.replace(/[^\d]/g, '');
+        if (value.length > 11) {
+            value = value.substring(0, 11);
+        }
+        e.target.value = value;
+    });
+
+    // Remove error state on input
+    [fullName, studentId, yearLevel, studentStatus, course, contactNumber, emailAddress].forEach(field => {
+        field.addEventListener('input', function() {
+            this.classList.remove('error');
+        });
+    });
+
+    console.log('✅ PLP Facial Monitor - Student Registration System Loaded');
+    console.log('📊 Current Students:', students.length);
+    console.log('💾 LocalStorage Test:', localStorage.getItem('students') ? 'Data Found' : 'No Data');
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PLP Facial Monitor - Security Settings</title>
+    <link rel="icon" href="../images/logosmallplp.png">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/sidebar.css">
+    <link rel="stylesheet" href="../css/logout-modal.css">
+    <link rel="stylesheet" href="../css/profile-Dropdownsettings.css">
+
+    <style>
+       :root {
+            --primary-dark: #064e3b; 
+            --sidebar-green: #1a4331; 
+            --header-green: #0a7b3d;
+            --white: #ffffff;
+            --accent-yellow: #facc15;
+            --card-green: #9ae6b4;
+            --card-orange: #fbd38d;
+            --card-red: #feb2b2;
+            --sidebar-width-expanded: 260px;
+            --sidebar-width-collapsed: 80px;
+            
+            /* Specific Colors matched from image */
+            --alert-success: #00c853;
+            --alert-success-bg: #99e9c4;
+            --alert-success-text: #064e3b;
+            
+            --alert-warning: #ff6d00;
+            --alert-warning-bg: #ffccbc;
+            --alert-warning-text: #7b341e;
+            
+            --alert-info: #2962ff;
+            --alert-info-bg: #c5cae9;
+            
+            --alert-purple: #2100bc;
+            --alert-purple-bg: #a399e4;
+            --alert-purple-text: #1a0066;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }      :root {
+            --primary-dark: #064e3b; 
+            --sidebar-green: #1a4331; 
+            --header-green: #0a7b3d;
+            --white: #ffffff;
+            --accent-yellow: #facc15;
+            --sidebar-width-expanded: 260px;
+        }
+
+        /* LOGS CONTAINER */
+        .logs-container {
+            width: 100%;
+        }
+
+        .log-card {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border-color);
+            width: 100%;
+        }
+
+        /* TABLE RESPONSIVENESS STRATEGY */
+        .log-table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            margin-top: 1rem;
+            border-radius: 8px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            min-width: 700px; /* Ensures table doesn't squish too much */
+        }
+
+        th {
+            padding: 15px;
+            background: #f8fafc;
+            color: var(--primary-dark);
+            font-weight: 700;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            border-bottom: 2px solid var(--border-color);
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid var(--border-color);
+            color: #334155;
+            font-size: 0.95rem;
+            vertical-align: middle;
+        }
+
+        .status-badge {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+
+        .status-success {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .device-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .device-icon {
+            width: 36px;
+            height: 36px;
+            background: #f1f5f9;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-dark);
+            flex-shrink: 0;
+        }
+
+
+
+        /* MEDIA QUERIES FOR DIFFERENT DEVICES */
+        @media (max-width: 1024px) {
+            .content {
+                padding: 1.5rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                padding: 1rem;
+            }
+            .content-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .title-group h2 {
+                font-size: 1.4rem;
+            }
+            .log-card {
+                padding: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .title-group h2 {
+                font-size: 1.2rem;
+            }
+            td, th {
+                padding: 12px 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div class="header-left">
+            <button id="menu-toggle" title="Toggle Menu">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="logo-container">
+                <img src="../images/logosmallplp.png" alt="PLP Logo">
+                <div class="brand-text">
+                    <h1>PLP Facial Monitor</h1>
+                    <p>PAMANTASAN NG LUNGSOD NG PASIG</p>
+                </div>
+            </div>
+        </div>
+        <div class="header-right">
+            <span id="live-date">load...</span>
+            <span id="live-time">00:00:00 AM</span>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <div class="sidebar-overlay" id="sidebar-overlay"></div>
+        
+        <nav class="sidebar" id="sidebar">
+            <div class="user-section" id="profileToggle">
+                <div class="user-main-display">
+                    <div class="avatar-circle">HN</div>
+                    <div class="user-info">
+                        <h4>Harlene Nebasa</h4>
+                        <p>nebasa_harlene@plpasig.edu.ph</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="profile-dropdown" id="profileMenu">
+                <a href="../html/profile-settings.html" class="dropdown-item">
+                    <i class="fas fa-user-cog"></i>
+                    <span>Profile Settings</span>
+                </a>
+                <a href="../server/change-password.html" class="dropdown-item">
+                    <i class="fas fa-key"></i>
+                    <span>Create New Password</span>
+                </a>
+                <a href="../server/security-logs.html" class="dropdown-item active">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>Security Passwords Changed</span>
+                </a>
+            </div>
+
+            <div class="nav-menu">
+                <a href="../server/dashboardpage.html" class="nav-item">
+                    <i class="fas fa-th-large"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="../server/studentregistrationpage.html" class="nav-item">
+                    <i class="fas fa-user-circle"></i>
+                    <span>Registration</span>
+                </a>
+                <a href="../server/studentrecords.html" class="nav-item">
+                    <i class="fas fa-folder"></i>
+                    <span>Student Records</span>
+                </a>
+                <a href="../server/archivepage.html" class="nav-item ">
+                    <i class="fas fa-archive"></i>
+                    <span>Archive</span>
+                </a>
+                <a href="../server/loginpage.html" class="nav-item logout" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </nav>
+
+        <main class="content">
+            <div class="content-header">
+                <div class="title-group">
+                    <h2>Security Passwords Changed</h2>
+                    <p>HISTORY OF PASSWORD UPDATES AND ACCOUNT SECURITY ACTIVITY</p>
+                </div>
+                <a href="dashboardpage.html" class="home-btn">
+                    <i class="fas fa-home"></i> Home
+                </a>
+            </div>
+
+
+            <div class="logs-container">
+                <section class="log-card">
+                    <div class="log-table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Date & Time</th>
+                                    <th>Activity</th>
+                                    <th>Device / Browser</th>
+                                    <th>IP Address</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Oct 24, 2023 • 02:30 PM</td>
+                                    <td><strong>Password Changed</strong></td>
+                                    <td>
+                                        <div class="device-info">
+                                            <div class="device-icon"><i class="fas fa-desktop"></i></div>
+                                            <span>Chrome on Windows</span>
+                                        </div>
+                                    </td>
+                                    <td>192.168.1.45</td>
+                                    <td><span class="status-badge status-success"><i class="fas fa-check-circle"></i> Success</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Sept 15, 2023 • 09:15 AM</td>
+                                    <td><strong>Password Changed</strong></td>
+                                    <td>
+                                        <div class="device-info">
+                                            <div class="device-icon"><i class="fas fa-mobile-alt"></i></div>
+                                            <span>Safari on iPhone</span>
+                                        </div>
+                                    </td>
+                                    <td>112.204.55.12</td>
+                                    <td><span class="status-badge status-success"><i class="fas fa-check-circle"></i> Success</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Aug 02, 2023 • 11:45 AM</td>
+                                    <td><strong>Initial Password Set</strong></td>
+                                    <td>
+                                        <div class="device-info">
+                                            <div class="device-icon"><i class="fas fa-desktop"></i></div>
+                                            <span>Edge on Windows</span>
+                                        </div>
+                                    </td>
+                                    <td>192.168.1.10</td>
+                                    <td><span class="status-badge status-success"><i class="fas fa-check-circle"></i> Success</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modals & Scripts -->
+    <div class="logout-modal" id="logoutModal">
+        <div class="logout-box">
+            <h3>Confirm Logout</h3>
+            <p>Are you sure you want to logout?</p>
+            <div class="logout-actions">
+                <button class="cancel-btn" id="cancelLogout">Cancel</button>
+                <button class="confirm-btn" id="confirmLogout">Yes, Logout</button>
+            </div>
+        </div>
+    </div>
+
+<script src="../js/sidebar.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const profileMenu = document.getElementById("profileMenu");
+    const profileToggle = document.getElementById("profileToggle");
+
+    // Automatically open dropdown
+    profileMenu.classList.add("active");
+    profileToggle.classList.add("active");
+});
+
+    </script>
+    <script src="../js/logout-modal.js"></script>
+    <script src="../js/profile-Dropdownsettings.js"></script>   
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function(){
+            const profileMenu = document.getElementById("profileMenu");
+            const profileToggle = document.getElementById("profileToggle");
+            
+            // UI state initialization
+            if(profileMenu && profileToggle) {
+                profileMenu.classList.add("active");
+                profileToggle.classList.add("active");
+            }
+        });
+    </script>
+
+</body>
+</html>
